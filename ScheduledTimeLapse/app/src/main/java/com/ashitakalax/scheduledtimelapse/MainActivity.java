@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "todo Create new Project", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -82,11 +83,12 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
+            ((TextView)this.findViewById(R.id.textView)).setText("TODO Start Camera View");
         } else if (id == R.id.nav_gallery) {
+            ((TextView)this.findViewById(R.id.textView)).setText("TODO open gallery");
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_user_manual) {
+            ((TextView)this.findViewById(R.id.textView)).setText("TODO open user manual");
 
         } else if (id == R.id.nav_share) {
 

@@ -1,8 +1,18 @@
 <resources>
-    <string name="app_name">ScheduledTimeLapse</string>
+    <string name="app_name">Scheduled TimeLapse</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <!--Default Strings-->
+    <string name="default_project_name">TimeLapse Project</string>
+
+    <!--Navigation Side Menu-->
+    <string name="navigation_camera_view">Camera View</string>
+    <string name="navigation_gallery">Gallery</string>
+    <string name="navigation_user_manual">User\'s Manual</string>
+    <string name="navigation_new_photo_project">New Photo Project</string>
+
 </resources>

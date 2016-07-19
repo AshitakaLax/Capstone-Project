@@ -15,6 +15,5 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testHello() throws Exception {
         Assert.assertTrue(true);
-
     }
 }
