@@ -29,7 +29,7 @@ public class CameraDbHelper extends SQLiteOpenHelper {
                 // the ID of the location entry associated with this weather data
                 CameraEntry.COLUMN_ISO + " INTEGER NOT NULL, " +
                 CameraEntry.COLUMN_SHUTTER_SPEED + " INTEGER NOT NULL, " +
-                CameraEntry.COLUMN_FLASH + " TEXT NOT NULL);";
+                CameraEntry.COLUMN_FLASH + " BOOLEAN NOT NULL);";
 
         sqLiteDatabase.execSQL(SQL_CREATE_CAMERA_TABLE);
     }

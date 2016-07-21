@@ -21,9 +21,14 @@
 
         <provider
             android:name=".data.CameraSettingsProvider"
-            android:authorities="com.ashitakalax.scheduledtimelapse.camera"
+            android:authorities="com.ashitakalax.scheduledtimelapse.data"
             android:enabled="true"
-            android:exported="true"></provider>
+            android:exported="true" />
+        <provider
+            android:name=".data.ProjectSettingsProvider"
+            android:authorities="com.ashitakalax.scheduledtimelapse.settings"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>

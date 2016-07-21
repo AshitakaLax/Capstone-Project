@@ -9,6 +9,7 @@ import android.provider.BaseColumns;
  * Created by Levi Balling on 7/19/2016.
  */
 public class CameraContract {
+
     public static final String CONTENT_AUTHORITY = "com.ashitakalax.scheduledtimelapse.data";
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);

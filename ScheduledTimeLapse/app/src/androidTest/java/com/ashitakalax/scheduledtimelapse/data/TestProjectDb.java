@@ -10,13 +10,13 @@ import java.util.HashSet;
 /**
  * Created by lballing on 7/19/2016.
  */
-public class TestCameraDb extends AndroidTestCase {
+public class TestProjectDb extends AndroidTestCase {
 
-    public static final String LOG_TAG = TestCameraDb.class.getSimpleName();
+    public static final String LOG_TAG = TestProjectDb.class.getSimpleName();
 
     // Since we want each test to start with a clean slate
     void deleteTheDatabase() {
-        mContext.deleteDatabase(CameraDbHelper.DATABASE_NAME);
+        mContext.deleteDatabase(ProjectDbHelper.DATABASE_NAME);
     }
 
     public void setUp() {
@@ -28,10 +28,10 @@ public class TestCameraDb extends AndroidTestCase {
         // Note that there will be another table in the DB that stores the
         // Android metadata (db version information)
         final HashSet<String> tableNameHashSet = new HashSet<String>();
-        tableNameHashSet.add(CameraContract.CameraEntry.TABLE_NAME);
+        tableNameHashSet.add(ProjectContract.ProjectEntry.TABLE_NAME);
 
-        mContext.deleteDatabase(CameraDbHelper.DATABASE_NAME);
-        SQLiteDatabase db = new CameraDbHelper(
+        mContext.deleteDatabase(ProjectDbHelper.DATABASE_NAME);
+        SQLiteDatabase db = new ProjectDbHelper(
                 this.mContext).getWritableDatabase();
         assertEquals(true, db.isOpen());
 
@@ -52,44 +52,45 @@ public class TestCameraDb extends AndroidTestCase {
                 tableNameHashSet.isEmpty());
 
         // now, do our tables contain the correct columns?
-        c = db.rawQuery("PRAGMA table_info(" + CameraContract.CameraEntry.TABLE_NAME + ")",
+        c = db.rawQuery("PRAGMA table_info(" + ProjectContract.ProjectEntry.TABLE_NAME + ")",
                 null);
 
         assertTrue("Error: This means that we were unable to query the database for table information.",
                 c.moveToFirst());
 
         // Build a HashSet of all of the column names we want to look for
-        final HashSet<String> CameraColumnHashSet = new HashSet<String>();
-        CameraColumnHashSet.add(CameraContract.CameraEntry._ID);
-        CameraColumnHashSet.add(CameraContract.CameraEntry.COLUMN_ISO);
-        CameraColumnHashSet.add(CameraContract.CameraEntry.COLUMN_SHUTTER_SPEED);
-        CameraColumnHashSet.add(CameraContract.CameraEntry.COLUMN_FLASH);
+        final HashSet<String> ProjectColumnHashSet = new HashSet<String>();
+        ProjectColumnHashSet.add(ProjectContract.ProjectEntry._ID);
+        ProjectColumnHashSet.add(ProjectContract.ProjectEntry.COLUMN_TITLE);
+        ProjectColumnHashSet.add(ProjectContract.ProjectEntry.COLUMN_FREQUENCY);
+        ProjectColumnHashSet.add(ProjectContract.ProjectEntry.COLUMN_START_TIME);
+        ProjectColumnHashSet.add(ProjectContract.ProjectEntry.COLUMN_END_TIME);
 
         int columnNameIndex = c.getColumnIndex("name");
         do {
             String columnName = c.getString(columnNameIndex);
-            CameraColumnHashSet.remove(columnName);
+            ProjectColumnHashSet.remove(columnName);
         } while (c.moveToNext());
 
         // if this fails, it means that your database doesn't contain all of the required location
         // entry columns
         assertTrue("Error: The database doesn't contain all of the required location entry columns",
-                CameraColumnHashSet.isEmpty());
+                ProjectColumnHashSet.isEmpty());
         db.close();
     }
 
-    public void testCameraTable() {
+    public void testProjectTable() {
 
-        CameraDbHelper dbHelper = new CameraDbHelper(mContext);
+        ProjectDbHelper dbHelper = new ProjectDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        ContentValues cameraValues = TestUtilities.createCameraValues();
+        ContentValues projectValues = TestUtilities.createProjectValues();
 
-        long rowId = db.insert(CameraContract.CameraEntry.TABLE_NAME, null, cameraValues);
+        long rowId = db.insert(ProjectContract.ProjectEntry.TABLE_NAME, null, projectValues);
         assertTrue(rowId != -1);
 
         Cursor cursor = db.query(
-                CameraContract.CameraEntry.TABLE_NAME,  // Table to Query
+                ProjectContract.ProjectEntry.TABLE_NAME,  // Table to Query
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
@@ -101,7 +102,7 @@ public class TestCameraDb extends AndroidTestCase {
         assertTrue("Error: No Records returned from location query", cursor.moveToFirst());
 
         TestUtilities.validateCurrentRecord("testInsertReadDb weatherEntry failed to validate",
-                cursor, cameraValues);
+                cursor, projectValues);
 
         assertFalse("Error: More than one record returned from weather query",
                 cursor.moveToNext());
