@@ -83,14 +83,14 @@ public class TestProjectProvider extends AndroidTestCase {
 
     public void testBasicProjectQuery() {
         // insert our test records into the database
-        CameraDbHelper dbHelper = new CameraDbHelper(mContext);
+        ProjectDbHelper dbHelper = new ProjectDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
 
         // Fantastic.  Now that we have a location, add some weather!
-        ContentValues cameraValues = TestUtilities.createCameraValues();
+        ContentValues projectValues = TestUtilities.createProjectValues();
 
-        long ProjectRowId = db.insert(ProjectEntry.TABLE_NAME, null, cameraValues);
+        long ProjectRowId = db.insert(ProjectEntry.TABLE_NAME, null, projectValues);
         assertTrue("Unable to Insert ProjectEntry into the Database", ProjectRowId != -1);
 
         db.close();
@@ -105,12 +105,12 @@ public class TestProjectProvider extends AndroidTestCase {
         );
 
         // Make sure we get the correct cursor out of the database
-        TestUtilities.validateCursor("testBasicProjectQuery", cursor, cameraValues);
+        TestUtilities.validateCursor("testBasicProjectQuery", cursor, projectValues);
     }
 
     public void testUpdateProject() {
         // Create a new map of values, where column names are the keys
-        ContentValues values = TestUtilities.createCameraValues();
+        ContentValues values = TestUtilities.createProjectValues();
 
         Uri projectUri = mContext.getContentResolver().
                 insert(ProjectEntry.CONTENT_URI, values);
