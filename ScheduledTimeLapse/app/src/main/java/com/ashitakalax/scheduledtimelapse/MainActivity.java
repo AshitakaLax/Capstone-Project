@@ -3,6 +3,8 @@ package com.ashitakalax.scheduledtimelapse;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,9 +16,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.ashitakalax.scheduledtimelapse.adapter.ProjectAdapter;
+// todo update this activity to be a fragment
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +35,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // goto new fragment to create a new project with all of it's settings
                 Snackbar.make(view, "todo Create new Project", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -41,6 +49,23 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // setup the recycler view
+        mRecyclerView = (RecyclerView)findViewById(R.id.my_recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout Manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new ProjectAdapter(this, new ProjectAdapter.ProjectAdapterOnClickHandler() {
+            @Override
+            public void onClick(ProjectAdapter.ProjectAdapterViewHolder vh) {
+
+            }
+        });
+        mRecyclerView.setAdapter(mAdapter);
+
+
     }
 
     @Override
