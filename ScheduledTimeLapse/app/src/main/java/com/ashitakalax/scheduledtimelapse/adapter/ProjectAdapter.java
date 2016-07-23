@@ -11,6 +11,10 @@ import android.widget.TextView;
 import com.ashitakalax.scheduledtimelapse.R;
 import com.ashitakalax.scheduledtimelapse.data.ProjectContract;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created by lballing on 7/21/2016.
  * Recycler view adapter for Projects
@@ -20,7 +24,24 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
     private Cursor mCursor;
     final private Context mContext;
     final private ProjectAdapterOnClickHandler mClickHandler;
-//    final private View mEmptyView;
+    // todo add the date and time formatters to a constants in utilities
+    private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("EEE, MMM d, yyyy  hh:mm aaa");
+
+    private static final String[] PROJECT_COLUMNS = {
+        ProjectContract.ProjectEntry.TABLE_NAME + "." + ProjectContract.ProjectEntry._ID,
+            ProjectContract.ProjectEntry.COLUMN_TITLE,
+            ProjectContract.ProjectEntry.COLUMN_FREQUENCY,
+            ProjectContract.ProjectEntry.COLUMN_START_TIME,
+            ProjectContract.ProjectEntry.COLUMN_END_TIME
+    };
+
+    // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
+    // must change.
+    static final int COL_PROJECT_ID = 0;
+    static final int COL_PROJECT_TITLE = 1;
+    static final int COL_PROJECT_FREQUENCY = 2;
+    static final int COL_PROJECT_START_TIME = 3;
+    static final int COL_PROJECT_END_TIME = 4;
 
     @Override
     public ProjectAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -38,11 +59,11 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
     @Override
     public void onBindViewHolder(ProjectAdapterViewHolder holder, int position) {
         mCursor.moveToPosition(position);
-
-//        int weatherId = mCursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID);
-//        int defaultImage;
-//        boolean useLongToday;
-
+        // todo add image to cardview(either default or one that is part of the set)
+        holder.mTitleTextView.setText(mCursor.getString(this.COL_PROJECT_TITLE));
+        holder.mFrequencyTextView.setText( "Frequency " + mCursor.getFloat(this.COL_PROJECT_FREQUENCY));
+        holder.mStartTimeTextView.setText(dateTimeFormat.format(new Date(mCursor.getLong(this.COL_PROJECT_START_TIME))));
+        holder.mEndTimeTextView.setText(dateTimeFormat.format(new Date(mCursor.getLong(this.COL_PROJECT_END_TIME))));
     }
 
     @Override
@@ -54,9 +75,15 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
     public class ProjectAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public final TextView mTitleTextView;
+        public final TextView mFrequencyTextView;
+        public final TextView mStartTimeTextView;
+        public final TextView mEndTimeTextView;
         public ProjectAdapterViewHolder(View itemView) {
             super(itemView);
             mTitleTextView = (TextView)itemView.findViewById(R.id.title_text_view);
+            mFrequencyTextView = (TextView)itemView.findViewById(R.id.frequency_text_view);
+            mStartTimeTextView = (TextView)itemView.findViewById(R.id.start_time_text_view);
+            mEndTimeTextView = (TextView)itemView.findViewById(R.id.end_time_text_view);
             itemView.setOnClickListener(this);
         }
 

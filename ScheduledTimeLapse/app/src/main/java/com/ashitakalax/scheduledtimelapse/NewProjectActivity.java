@@ -159,7 +159,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         ContentValues newProjectValues = new ContentValues();
 
         newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_TITLE, this.titleEditText.getText().toString());
-        newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_FREQUENCY, this.frequencyEditText.getText().toString());
+        newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_FREQUENCY, Float.parseFloat(this.frequencyEditText.getText().toString()));
         newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_START_TIME, this.startCalendar.getTime().getTime());
         newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_END_TIME, this.endCalendar.getTime().getTime());
         this.getContentResolver().insert(ProjectContract.ProjectEntry.CONTENT_URI, newProjectValues);
