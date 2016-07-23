@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.ashitakalax.scheduledtimelapse.R;
+import com.ashitakalax.scheduledtimelapse.data.ProjectContract;
 
 /**
  * Created by lballing on 7/21/2016.
@@ -72,6 +73,11 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
     public ProjectAdapter(Context context, ProjectAdapterOnClickHandler dh) {
         mContext = context;
         mClickHandler = dh;
+        this.mCursor = context.getContentResolver().query(ProjectContract.ProjectEntry.CONTENT_URI
+                ,null
+        ,null
+        ,null
+        ,null);
     }
 
     public Cursor getCursor() {

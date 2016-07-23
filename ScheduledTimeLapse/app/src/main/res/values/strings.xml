@@ -15,4 +15,6 @@
     <string name="navigation_user_manual">User\'s Manual</string>
     <string name="navigation_new_photo_project">New Photo Project</string>
 
+    <!--Project Activity-->
+    <string name="project_main_name">New Project</string>
 </resources>
