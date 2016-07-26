@@ -107,7 +107,10 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
-            ((TextView)this.findViewById(R.id.textView)).setText("TODO Start Camera View");
+            // start the CamerPreview activity
+            Intent intent = new Intent(this, CameraPreviewActivity.class);
+            startActivity(intent);
+            return true;
         } else if (id == R.id.nav_gallery) {
             ((TextView)this.findViewById(R.id.textView)).setText("TODO open gallery");
 
