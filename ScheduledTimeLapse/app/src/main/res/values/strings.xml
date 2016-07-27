@@ -17,4 +17,5 @@
 
     <!--Project Activity-->
     <string name="project_main_name">New Project</string>
+    <string name="user_manual_name">User Manual</string>
 </resources>

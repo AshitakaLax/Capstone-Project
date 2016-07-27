@@ -115,8 +115,10 @@ public class MainActivity extends AppCompatActivity
             ((TextView)this.findViewById(R.id.textView)).setText("TODO open gallery");
 
         } else if (id == R.id.nav_user_manual) {
-            ((TextView)this.findViewById(R.id.textView)).setText("TODO open user manual");
 
+            // start the User Manual activity
+            Intent intent = new Intent(this, UserManualActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

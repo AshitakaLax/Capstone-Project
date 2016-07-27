@@ -43,6 +43,14 @@
             android:value="com.ashitakalax.scheduledtimelapse.MainActivity" />
         </activity>
 
+        <activity android:name="com.ashitakalax.scheduledtimelapse.UserManualActivity"
+            android:label="@string/user_manual_name"
+            android:parentActivityName="com.ashitakalax.scheduledtimelapse.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.ashitakalax.scheduledtimelapse.MainActivity" />
+        </activity>
+
         <provider
             android:name=".data.CameraSettingsProvider"
             android:authorities="com.ashitakalax.scheduledtimelapse.data"
