@@ -12,6 +12,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by lballing on 7/26/2016.
@@ -50,6 +53,20 @@ public class CameraController implements Camera.PictureCallback{
             // no camera on this device
             return false;
         }
+    }
+
+    public List<String> getIsoOptions()
+    {
+        return getCameraTypeOptions("iso-values");
+    }
+
+    private List<String> getCameraTypeOptions(String parameterType)
+    {
+        Camera camera = getCameraInstance();
+        Camera.Parameters parameters = camera.getParameters();
+        String values = parameters.get(parameterType);
+        camera.release();
+        return Arrays.asList(values.split("\\s*,\\s*"));
     }
 
     @Override
