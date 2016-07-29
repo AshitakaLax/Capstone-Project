@@ -23,8 +23,17 @@ import java.util.List;
 public class CameraController implements Camera.PictureCallback{
 
     static final String TAG = "CAMERA_CONTROLLER";
-    private Camera mCamera;
-    private Camera.PictureCallback tempCallback;
+    public static final String PIC_SIZE_GET_KEY = "picture-size-values";
+    public static final String PIC_SIZE_SET_KEY = "picture-size";
+    public static final String ISO_GET_KEY = "iso-values";
+    public static final String ISO_SET_KEY = "iso";
+    public static final String FLASH_GET_KEY = "flash-mode-values";
+    public static final String FLASH_SET_KEY = "flash-mode";
+    public static final String FOCUS_GET_KEY = "focus-mode-values";
+    public static final String FOCUS_SET_KEY = "focus-mode";
+    public static final String FORMAT_GET_KEY = "picture-format-values";
+    public static final String FORMAT_SET_KEY = "picture-format";
+
     public CameraController()
     {
         //todo setup a way to have a camera preview to reference this.
@@ -55,12 +64,26 @@ public class CameraController implements Camera.PictureCallback{
         }
     }
 
-    public List<String> getIsoOptions()
+    public static List<String> getCameraOptions(String option)
     {
-        return getCameraTypeOptions("iso-values");
+        Camera camera = getCameraInstance();
+        Camera.Parameters parameters = camera.getParameters();
+        String values = parameters.get(option);
+        camera.release();
+        return Arrays.asList(values.split("\\s*,\\s*"));
     }
 
-    private List<String> getCameraTypeOptions(String parameterType)
+    public static String getCameraOption(String option)
+    {
+        Camera camera = getCameraInstance();
+        Camera.Parameters parameters = camera.getParameters();
+        String value = parameters.get(option);
+        camera.release();
+        return value;
+    }
+
+
+    public static List<String> getCameraTypeOptions(String parameterType)
     {
         Camera camera = getCameraInstance();
         Camera.Parameters parameters = camera.getParameters();
@@ -68,6 +91,23 @@ public class CameraController implements Camera.PictureCallback{
         camera.release();
         return Arrays.asList(values.split("\\s*,\\s*"));
     }
+
+    public static boolean setCameraOption(String parameterType, String value)
+    {
+        try {
+            Camera camera = getCameraInstance();
+            Camera.Parameters parameters = camera.getParameters();
+            parameters.set(parameterType, value);
+            camera.setParameters(parameters);
+            camera.release();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+
 
     @Override
     public void onPictureTaken(byte[] bytes, Camera camera) {
