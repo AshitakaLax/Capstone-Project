@@ -1,8 +1,13 @@
 package com.ashitakalax.scheduledtimelapse;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,24 +19,27 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.ashitakalax.scheduledtimelapse.adapter.ProjectAdapter;
+// todo update this activity to be a fragment
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener{
 
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
+    // Whether or not we are in dual-pane mode
+    boolean mIsDualPane = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "todo Create new Project", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        fab.setOnClickListener(this);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -41,6 +49,22 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // setup the recycler view
+        mRecyclerView = (RecyclerView)findViewById(R.id.my_recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout Manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new ProjectAdapter(this, new ProjectAdapter.ProjectAdapterOnClickHandler() {
+            @Override
+            public void onClick(ProjectAdapter.ProjectAdapterViewHolder vh) {
+
+            }
+        });
+        mRecyclerView.setAdapter(mAdapter);
+
     }
 
     @Override
@@ -69,6 +93,10 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
+            // start the Settings activity
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -83,13 +111,18 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
-            ((TextView)this.findViewById(R.id.textView)).setText("TODO Start Camera View");
+            // start the CamerPreview activity
+            Intent intent = new Intent(this, CameraPreviewActivity.class);
+            startActivity(intent);
+            return true;
         } else if (id == R.id.nav_gallery) {
             ((TextView)this.findViewById(R.id.textView)).setText("TODO open gallery");
 
         } else if (id == R.id.nav_user_manual) {
-            ((TextView)this.findViewById(R.id.textView)).setText("TODO open user manual");
 
+            // start the User Manual activity
+            Intent intent = new Intent(this, UserManualActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
@@ -99,5 +132,12 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onClick(View view) {
+        // goto new fragment to create a new project with all of it's settings
+        Intent intent = new Intent(this, NewProjectActivity.class);
+        startActivity(intent);
     }
 }

@@ -15,4 +15,12 @@
     <string name="navigation_user_manual">User\'s Manual</string>
     <string name="navigation_new_photo_project">New Photo Project</string>
 
+    <!--Project Activity-->
+    <string name="project_main_name">New Project</string>
+    <string name="user_manual_name">User Manual</string>
+    <string name="camera_settings_name">Camera Settings</string>
+    <string name="camera_iso">Camera ISO:</string>
+    <string name="file_format">File Format</string>
+    <string name="focus">Focus</string>
+    <string name="flash">Flash</string>
 </resources>
