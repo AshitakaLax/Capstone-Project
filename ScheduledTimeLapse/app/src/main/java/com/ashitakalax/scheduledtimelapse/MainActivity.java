@@ -1,5 +1,7 @@
 package com.ashitakalax.scheduledtimelapse;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,8 +20,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ashitakalax.scheduledtimelapse.adapter.ProjectAdapter;
+import com.ashitakalax.scheduledtimelapse.alarm.AlarmReceiver;
+
+import java.util.Calendar;
+
 // todo update this activity to be a fragment
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener{
@@ -30,6 +37,8 @@ public class MainActivity extends AppCompatActivity
 
     // Whether or not we are in dual-pane mode
     boolean mIsDualPane = false;
+    private PendingIntent pendingIntent;
+    private AlarmReceiver alarm = new AlarmReceiver();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +74,25 @@ public class MainActivity extends AppCompatActivity
         });
         mRecyclerView.setAdapter(mAdapter);
 
+        alarm.setAlarm(this);
+
     }
+
+//    private void sampleAlarmStart()
+//    {
+//        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+//        int interval = 8000;
+//
+//        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+//        pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+//
+//        // Set the alarm to start at approximately 2:00 p.m.
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTimeInMillis(System.currentTimeMillis() + interval);
+//
+//        manager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), interval, pendingIntent);
+//        Toast.makeText(this, "Alarm Set", Toast.LENGTH_SHORT).show();
+//    }
 
     @Override
     public void onBackPressed() {
