@@ -4,15 +4,38 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.PowerManager;
 import android.widget.Toast;
+
+import com.ashitakalax.scheduledtimelapse.data.ProjectContract;
+
+import java.util.Calendar;
+import java.util.concurrent.SynchronousQueue;
 
 /**
  * Created by lballing on 7/30/2016.
  * this class will handle the broadcast of the alarm manager
  */
 public class AlarmReceiver extends BroadcastReceiver{
+
+    private static final String[] PROJECT_COLUMNS = {
+            ProjectContract.ProjectEntry.TABLE_NAME + "." + ProjectContract.ProjectEntry._ID,
+            ProjectContract.ProjectEntry.COLUMN_TITLE,
+            ProjectContract.ProjectEntry.COLUMN_FREQUENCY,
+            ProjectContract.ProjectEntry.COLUMN_START_TIME,
+            ProjectContract.ProjectEntry.COLUMN_END_TIME
+    };
+
+    // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
+    // must change.
+    static final int COL_PROJECT_ID = 0;
+    static final int COL_PROJECT_TITLE = 1;
+    static final int COL_PROJECT_FREQUENCY = 2;
+    static final int COL_PROJECT_START_TIME = 3;
+    static final int COL_PROJECT_END_TIME = 4;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -22,6 +45,8 @@ public class AlarmReceiver extends BroadcastReceiver{
 
         // Put here YOUR code.
         Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
+
+        // update the next time this specific project will go off next
 
         wl.release();
 //        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -34,8 +59,51 @@ public class AlarmReceiver extends BroadcastReceiver{
 //        Toast.makeText(context, "I'm running", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Checks that alarms are setup to run at the correct time to take a picture
+     * @param context
+     */
+    public void checkAlarms(Context context)
+    {
+        String sortOrder = ProjectContract.ProjectEntry.COLUMN_START_TIME + "ASC";
+        Cursor cursor = context.getContentResolver().query(ProjectContract.ProjectEntry.CONTENT_URI
+        ,null
+        ,null
+        ,null
+        ,sortOrder);
+
+        // for this I need to know the next alarm to set
+        // we need to calculate what the time will be
+        cursor.moveToFirst();
+        long startTime = cursor.getLong(COL_PROJECT_START_TIME);
+        long endTime = cursor.getLong(COL_PROJECT_END_TIME);
+        float frequency = cursor.getFloat(COL_PROJECT_FREQUENCY);
+
+
+
+        cursor.close();
+        //get the next alarm that we need
+        AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        Intent i = new Intent("alarm.START_ALARM");
+//        Intent i = new Intent(context, AlarmReceiver.class);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60, pi); // Millisec * Second * Minute
+    }
+
+    public Calendar getNextAlarm(long startTime, float frequency)
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(startTime);
+        double period = (1/frequency);
+        //the period is how far apart each picture will be taken, should be 5+ seconds
+        period *= 1000; // convert the period into milliseconds for precision here
+        calendar.add(Calendar.MILLISECOND, (int)period);
+        return calendar;//currently this isn't correct. this could be in the past
+    }
+
     public void setAlarm(Context context)
     {
+        //get the next alarm that we need
         AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent("alarm.START_ALARM");
 //        Intent i = new Intent(context, AlarmReceiver.class);

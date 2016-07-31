@@ -60,10 +60,10 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
     public void onBindViewHolder(ProjectAdapterViewHolder holder, int position) {
         mCursor.moveToPosition(position);
         // todo add image to cardview(either default or one that is part of the set)
-        holder.mTitleTextView.setText(mCursor.getString(this.COL_PROJECT_TITLE));
-        holder.mFrequencyTextView.setText( "Frequency " + mCursor.getFloat(this.COL_PROJECT_FREQUENCY));
-        holder.mStartTimeTextView.setText(dateTimeFormat.format(new Date(mCursor.getLong(this.COL_PROJECT_START_TIME))));
-        holder.mEndTimeTextView.setText(dateTimeFormat.format(new Date(mCursor.getLong(this.COL_PROJECT_END_TIME))));
+        holder.mTitleTextView.setText(mCursor.getString(COL_PROJECT_TITLE));
+        holder.mFrequencyTextView.setText( "Frequency " + mCursor.getFloat(COL_PROJECT_FREQUENCY));
+        holder.mStartTimeTextView.setText(dateTimeFormat.format(new Date(mCursor.getLong(COL_PROJECT_START_TIME))));
+        holder.mEndTimeTextView.setText(dateTimeFormat.format(new Date(mCursor.getLong(COL_PROJECT_END_TIME))));
     }
 
     @Override
@@ -106,15 +106,4 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
         ,null
         ,null);
     }
-
-    public Cursor getCursor() {
-        return mCursor;
-    }
-
-    public void swapCursor(Cursor newCursor) {
-        mCursor = newCursor;
-        notifyDataSetChanged();
-        //mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
-    }
-
 }
