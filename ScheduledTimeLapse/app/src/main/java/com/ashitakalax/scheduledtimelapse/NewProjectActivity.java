@@ -2,19 +2,24 @@ package com.ashitakalax.scheduledtimelapse;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.ashitakalax.scheduledtimelapse.adapter.ProjectAdapter;
 import com.ashitakalax.scheduledtimelapse.data.ProjectContract;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -23,6 +28,23 @@ import java.util.Calendar;
  * This activity will handle the creation of a new Project
  */
 public class NewProjectActivity extends AppCompatActivity implements View.OnClickListener{
+
+    public static final String PROJECT_POSITION = "PROJECT_POSITION";
+    private static final String[] PROJECT_COLUMNS = {
+            ProjectContract.ProjectEntry.TABLE_NAME + "." + ProjectContract.ProjectEntry._ID,
+            ProjectContract.ProjectEntry.COLUMN_TITLE,
+            ProjectContract.ProjectEntry.COLUMN_FREQUENCY,
+            ProjectContract.ProjectEntry.COLUMN_START_TIME,
+            ProjectContract.ProjectEntry.COLUMN_END_TIME
+    };
+
+    // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
+    // must change.
+    static final int COL_PROJECT_ID = 0;
+    static final int COL_PROJECT_TITLE = 1;
+    static final int COL_PROJECT_FREQUENCY = 2;
+    static final int COL_PROJECT_START_TIME = 3;
+    static final int COL_PROJECT_END_TIME = 4;
 
     private EditText titleEditText;
     private EditText frequencyEditText;
@@ -33,6 +55,9 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     private Calendar startCalendar = Calendar.getInstance();
     private Calendar endCalendar = Calendar.getInstance();
     private Button saveProjectButton;
+
+    private int mProjectPosition;
+    private int mProjectId;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy");
     private SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm aaa");//todo update to have second precision
@@ -72,6 +97,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute, int second) {
             endCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             endCalendar.set(Calendar.MINUTE, minute);
+
             endTimeTextView.setText(timeFormat.format(endCalendar.getTime()));
         }
     };
@@ -79,6 +105,11 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mProjectPosition = -1;
+        if(savedInstanceState == null)
+        {
+            mProjectPosition= getIntent().getIntExtra(PROJECT_POSITION, -1);
+        }
 
         setContentView(R.layout.new_project_layout);
 
@@ -91,11 +122,50 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         startTimeTextView = (TextView)findViewById(R.id.startTimeEditText);
         endDateTextView = (TextView) findViewById(R.id.endDateEditText);
         endTimeTextView = (TextView) findViewById(R.id.endTimeEditText);
-        Calendar now = Calendar.getInstance();
-        startDateTextView.setText(dateFormat.format(now.getTime()));
-        startTimeTextView.setText(timeFormat.format(now.getTime()));
-        endDateTextView.setText(dateFormat.format(now.getTime()));
-        endTimeTextView.setText(timeFormat.format(now.getTime()));
+
+        if(mProjectPosition > -1)
+        {
+            //get the cursor with this position
+            Cursor cursor = getContentResolver().query(ProjectContract.ProjectEntry.CONTENT_URI
+                    ,null
+                    ,null
+                    ,null
+                    ,null);
+            try {
+                cursor.moveToPosition(mProjectPosition);
+
+                String titleStr = cursor.getString(COL_PROJECT_TITLE);
+                Float frequency = cursor.getFloat(COL_PROJECT_FREQUENCY);
+                long startRaw = cursor.getLong(COL_PROJECT_START_TIME);
+                long endRaw = cursor.getLong(COL_PROJECT_END_TIME);
+                mProjectId = cursor.getInt(COL_PROJECT_ID);
+                titleEditText.setText(titleStr);
+                frequencyEditText.setText(NumberFormat.getNumberInstance().format(frequency));
+                Calendar temp = Calendar.getInstance();
+                temp.setTimeInMillis(startRaw);
+
+                startDateTextView.setText(dateFormat.format(temp.getTime()));
+                startTimeTextView.setText(timeFormat.format(temp.getTime()));
+                temp.setTimeInMillis(endRaw);
+                endDateTextView.setText(dateFormat.format(temp.getTime()));
+                endTimeTextView.setText(timeFormat.format(temp.getTime()));
+                saveProjectButton.setText("Update Project");
+                cursor.close();
+            }
+            catch(NullPointerException exception)
+            {
+                Log.d("Scheduled timelapse", exception.getMessage());
+                mProjectPosition = -1;
+            }
+        }
+
+        if(mProjectPosition == -1) {
+            Calendar now = Calendar.getInstance();
+            startDateTextView.setText(dateFormat.format(now.getTime()));
+            startTimeTextView.setText(timeFormat.format(now.getTime()));
+            endDateTextView.setText(dateFormat.format(now.getTime()));
+            endTimeTextView.setText(timeFormat.format(now.getTime()));
+        }
         saveProjectButton.setOnClickListener(this);
         startTimeTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,14 +225,33 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void onClick(View view) {
         // add new project
+        //check that the values are valid
+        Calendar now = Calendar.getInstance();
+        now.setTimeInMillis(System.currentTimeMillis());
 
+        if(this.startCalendar.compareTo(this.endCalendar) > 0)
+        {
+            Toast.makeText(this, "Invalid Time set, End Time can't be before start Time", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if(now.compareTo(startCalendar) > 0)
+        {
+            Toast.makeText(this, "Invalid Time set, Start Time can't be before now", Toast.LENGTH_LONG).show();
+            return;
+        }
         ContentValues newProjectValues = new ContentValues();
 
         newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_TITLE, this.titleEditText.getText().toString());
         newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_FREQUENCY, Float.parseFloat(this.frequencyEditText.getText().toString()));
         newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_START_TIME, this.startCalendar.getTime().getTime());
         newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_END_TIME, this.endCalendar.getTime().getTime());
-        this.getContentResolver().insert(ProjectContract.ProjectEntry.CONTENT_URI, newProjectValues);
+        if(this.mProjectPosition > -1)
+        {
+            this.getContentResolver().update(ProjectContract.ProjectEntry.CONTENT_URI, newProjectValues, ProjectContract.ProjectEntry._ID + "=?",new String[] {String.valueOf(mProjectId)});
+        }
+        else {
+            this.getContentResolver().insert(ProjectContract.ProjectEntry.CONTENT_URI, newProjectValues);
+        }
 
         //goto home project
         Intent homeIntent = new Intent(this, MainActivity.class);

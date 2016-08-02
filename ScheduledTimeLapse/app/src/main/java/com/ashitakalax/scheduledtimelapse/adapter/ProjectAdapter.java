@@ -89,9 +89,13 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
 
         @Override
         public void onClick(View view) {
+            //check that all the input is valid
+
+            // check that none of them are
             mClickHandler.onClick(this);
         }
     }
+
 
     public interface ProjectAdapterOnClickHandler {
         void onClick(ProjectAdapterViewHolder vh);

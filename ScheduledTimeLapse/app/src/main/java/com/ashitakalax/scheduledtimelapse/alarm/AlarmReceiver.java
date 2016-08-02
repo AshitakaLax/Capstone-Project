@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.ashitakalax.scheduledtimelapse.data.ProjectContract;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.concurrent.SynchronousQueue;
 
@@ -49,6 +50,7 @@ public class AlarmReceiver extends BroadcastReceiver{
         // update the next time this specific project will go off next
 
         wl.release();
+
 //        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 //
 //        Intent alarmIntent = new Intent(context, AlarmReceiver.class);
@@ -70,24 +72,66 @@ public class AlarmReceiver extends BroadcastReceiver{
         ,null
         ,null
         ,null
-        ,sortOrder);
+        ,null);
+
+        if(cursor == null)
+        {
+            return;
+        }
 
         // for this I need to know the next alarm to set
         // we need to calculate what the time will be
-        cursor.moveToFirst();
-        long startTime = cursor.getLong(COL_PROJECT_START_TIME);
-        long endTime = cursor.getLong(COL_PROJECT_END_TIME);
-        float frequency = cursor.getFloat(COL_PROJECT_FREQUENCY);
+        ArrayList<Calendar> Times = new ArrayList<>();
+        ArrayList<Integer> increments = new ArrayList<>();
+        Calendar now = Calendar.getInstance();
+        now.setTimeInMillis(System.currentTimeMillis());
+        try {
+            while (cursor.moveToNext()) {
 
+                long startTime = cursor.getLong(COL_PROJECT_START_TIME);
+                long endTime = cursor.getLong(COL_PROJECT_END_TIME);
+                float frequency = cursor.getFloat(COL_PROJECT_FREQUENCY);
+                //check if the endTime has already past
+                Calendar endCalendarTime = Calendar.getInstance();
+                endCalendarTime.setTimeInMillis(endTime);
+                if(endCalendarTime.compareTo(now) >= 0)
+                {
+                    continue;
+                }
+                // go to the next alarm time
+                Calendar startCalendarTime = Calendar.getInstance();
+                startCalendarTime.setTimeInMillis(startTime);
+                //convert the frequency into milliseconds
+                double period = (1/frequency)*1000;
 
+                int frequencyIncrement = (int)(period);//time in milliseconds
+                while(startCalendarTime.getTimeInMillis() < now.getTimeInMillis())
+                {
+                    startCalendarTime.add(Calendar.MILLISECOND, frequencyIncrement);
+                }
 
-        cursor.close();
+                if(startCalendarTime.compareTo(endCalendarTime) >= 0)
+                {
+                    continue;
+                }
+                //time is valid to set
+                Times.add(startCalendarTime);
+                increments.add(frequencyIncrement);
+            }
+        } finally {
+            cursor.close();
+        }
+
+        //todo sort through all of the arrays
         //get the next alarm that we need
         AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent("alarm.START_ALARM");
-//        Intent i = new Intent(context, AlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
-        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60, pi); // Millisec * Second * Minute
+        for (int j = 0; j < Times.size(); j++) {
+            Calendar alarmCalendar = Times.get(j);
+            int alarmIncrement = increments.get(j);
+            am.setRepeating(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis(), alarmIncrement, pi); // Millisec * Second * Minute
+        }
     }
 
     public Calendar getNextAlarm(long startTime, float frequency)
@@ -103,12 +147,14 @@ public class AlarmReceiver extends BroadcastReceiver{
 
     public void setAlarm(Context context)
     {
-        //get the next alarm that we need
-        AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        Intent i = new Intent("alarm.START_ALARM");
-//        Intent i = new Intent(context, AlarmReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
-        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60, pi); // Millisec * Second * Minute
+        checkAlarms(context);
+        return;
+//        //get the next alarm that we need
+//        AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+//        Intent i = new Intent("alarm.START_ALARM");
+////        Intent i = new Intent(context, AlarmReceiver.class);
+//        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+//        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60, pi); // Millisec * Second * Minute
     }
 
     public void cancelAlarm(Context context)

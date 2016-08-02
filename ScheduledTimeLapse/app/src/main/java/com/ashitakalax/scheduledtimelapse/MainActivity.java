@@ -1,15 +1,11 @@
 package com.ashitakalax.scheduledtimelapse;
 
-import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.AttributeSet;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,12 +16,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ashitakalax.scheduledtimelapse.adapter.ProjectAdapter;
 import com.ashitakalax.scheduledtimelapse.alarm.AlarmReceiver;
-
-import java.util.Calendar;
 
 // todo update this activity to be a fragment
 public class MainActivity extends AppCompatActivity
@@ -69,7 +62,12 @@ public class MainActivity extends AppCompatActivity
         mAdapter = new ProjectAdapter(this, new ProjectAdapter.ProjectAdapterOnClickHandler() {
             @Override
             public void onClick(ProjectAdapter.ProjectAdapterViewHolder vh) {
+                //start the newProjectActivity
+                Intent intent = new Intent(getApplicationContext(), NewProjectActivity.class);
+                int position = vh.getAdapterPosition();
 
+                intent.putExtra(NewProjectActivity.PROJECT_POSITION, position);
+                startActivity(intent);
             }
         });
         mRecyclerView.setAdapter(mAdapter);
@@ -165,6 +163,7 @@ public class MainActivity extends AppCompatActivity
     public void onClick(View view) {
         // goto new fragment to create a new project with all of it's settings
         Intent intent = new Intent(this, NewProjectActivity.class);
+        intent.putExtra(NewProjectActivity.PROJECT_POSITION, -1);
         startActivity(intent);
     }
 }
