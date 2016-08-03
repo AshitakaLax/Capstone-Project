@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +36,8 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
             ProjectContract.ProjectEntry.COLUMN_TITLE,
             ProjectContract.ProjectEntry.COLUMN_FREQUENCY,
             ProjectContract.ProjectEntry.COLUMN_START_TIME,
-            ProjectContract.ProjectEntry.COLUMN_END_TIME
+            ProjectContract.ProjectEntry.COLUMN_END_TIME,
+            ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE
     };
 
     // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
@@ -45,6 +47,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     static final int COL_PROJECT_FREQUENCY = 2;
     static final int COL_PROJECT_START_TIME = 3;
     static final int COL_PROJECT_END_TIME = 4;
+    static final int COL_PROJECT_ACTIVE = 5;
 
     private EditText titleEditText;
     private EditText frequencyEditText;
@@ -55,6 +58,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     private Calendar startCalendar = Calendar.getInstance();
     private Calendar endCalendar = Calendar.getInstance();
     private Button saveProjectButton;
+    private Switch mActiveSwitch;
 
     private int mProjectPosition;
     private int mProjectId;
@@ -122,34 +126,46 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         startTimeTextView = (TextView)findViewById(R.id.startTimeEditText);
         endDateTextView = (TextView) findViewById(R.id.endDateEditText);
         endTimeTextView = (TextView) findViewById(R.id.endTimeEditText);
+        mActiveSwitch = (Switch) findViewById(R.id.projectActiveSwitch);
 
         if(mProjectPosition > -1)
         {
             //get the cursor with this position
-            Cursor cursor = getContentResolver().query(ProjectContract.ProjectEntry.CONTENT_URI
+            Cursor cursor =getContentResolver().query(
+                    ProjectContract.ProjectEntry.CONTENT_URI
                     ,null
-                    ,null
-                    ,null
-                    ,null);
+                    ,ProjectContract.ProjectEntry._ID + " = ?"
+                    ,new String[] {String.valueOf(mProjectPosition)}, null);
+
+//            Cursor cursor = getContentResolver().query(ProjectContract.ProjectEntry.CONTENT_URI
+//                    ,null
+//                    ,null
+//                    ,null
+//                    ,null);
             try {
-                cursor.moveToPosition(mProjectPosition);
+                cursor.moveToFirst();
+//                cursor.moveToPosition(mProjectPosition);
 
                 String titleStr = cursor.getString(COL_PROJECT_TITLE);
                 Float frequency = cursor.getFloat(COL_PROJECT_FREQUENCY);
                 long startRaw = cursor.getLong(COL_PROJECT_START_TIME);
                 long endRaw = cursor.getLong(COL_PROJECT_END_TIME);
                 mProjectId = cursor.getInt(COL_PROJECT_ID);
+                boolean projectActive = cursor.getString(COL_PROJECT_ACTIVE).equals("1");
                 titleEditText.setText(titleStr);
                 frequencyEditText.setText(NumberFormat.getNumberInstance().format(frequency));
                 Calendar temp = Calendar.getInstance();
                 temp.setTimeInMillis(startRaw);
+                startCalendar.setTimeInMillis(startRaw);
 
                 startDateTextView.setText(dateFormat.format(temp.getTime()));
                 startTimeTextView.setText(timeFormat.format(temp.getTime()));
                 temp.setTimeInMillis(endRaw);
+                endCalendar.setTimeInMillis(endRaw);
                 endDateTextView.setText(dateFormat.format(temp.getTime()));
                 endTimeTextView.setText(timeFormat.format(temp.getTime()));
                 saveProjectButton.setText("Update Project");
+                mActiveSwitch.setChecked(projectActive);
                 cursor.close();
             }
             catch(NullPointerException exception)
@@ -229,12 +245,12 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         Calendar now = Calendar.getInstance();
         now.setTimeInMillis(System.currentTimeMillis());
 
-        if(this.startCalendar.compareTo(this.endCalendar) > 0)
+        if(this.startCalendar.getTimeInMillis() > this.endCalendar.getTimeInMillis())
         {
             Toast.makeText(this, "Invalid Time set, End Time can't be before start Time", Toast.LENGTH_LONG).show();
             return;
         }
-        if(now.compareTo(startCalendar) > 0)
+        if(now.getTimeInMillis() > startCalendar.getTimeInMillis())
         {
             Toast.makeText(this, "Invalid Time set, Start Time can't be before now", Toast.LENGTH_LONG).show();
             return;
@@ -245,6 +261,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_FREQUENCY, Float.parseFloat(this.frequencyEditText.getText().toString()));
         newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_START_TIME, this.startCalendar.getTime().getTime());
         newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_END_TIME, this.endCalendar.getTime().getTime());
+        newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE, this.mActiveSwitch.isChecked());
         if(this.mProjectPosition > -1)
         {
             this.getContentResolver().update(ProjectContract.ProjectEntry.CONTENT_URI, newProjectValues, ProjectContract.ProjectEntry._ID + "=?",new String[] {String.valueOf(mProjectId)});
@@ -252,9 +269,11 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         else {
             this.getContentResolver().insert(ProjectContract.ProjectEntry.CONTENT_URI, newProjectValues);
         }
+        //Check if the project is active, if so then deactivate others
 
         //goto home project
         Intent homeIntent = new Intent(this, MainActivity.class);
+
         startActivity(homeIntent);
     }
 }

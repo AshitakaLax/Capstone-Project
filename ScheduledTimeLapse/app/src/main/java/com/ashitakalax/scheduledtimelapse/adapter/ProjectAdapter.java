@@ -32,7 +32,8 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
             ProjectContract.ProjectEntry.COLUMN_TITLE,
             ProjectContract.ProjectEntry.COLUMN_FREQUENCY,
             ProjectContract.ProjectEntry.COLUMN_START_TIME,
-            ProjectContract.ProjectEntry.COLUMN_END_TIME
+            ProjectContract.ProjectEntry.COLUMN_END_TIME,
+            ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE
     };
 
     // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
@@ -42,6 +43,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
     static final int COL_PROJECT_FREQUENCY = 2;
     static final int COL_PROJECT_START_TIME = 3;
     static final int COL_PROJECT_END_TIME = 4;
+    static final int COL_PROJECT_ACTIVE = 5;
 
     @Override
     public ProjectAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -60,10 +62,21 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
     public void onBindViewHolder(ProjectAdapterViewHolder holder, int position) {
         mCursor.moveToPosition(position);
         // todo add image to cardview(either default or one that is part of the set)
+        holder.mProjectId = mCursor.getInt(COL_PROJECT_ID);
         holder.mTitleTextView.setText(mCursor.getString(COL_PROJECT_TITLE));
         holder.mFrequencyTextView.setText( "Frequency " + mCursor.getFloat(COL_PROJECT_FREQUENCY));
         holder.mStartTimeTextView.setText(dateTimeFormat.format(new Date(mCursor.getLong(COL_PROJECT_START_TIME))));
         holder.mEndTimeTextView.setText(dateTimeFormat.format(new Date(mCursor.getLong(COL_PROJECT_END_TIME))));
+        String activeStatus;
+        if(mCursor.getString(COL_PROJECT_ACTIVE).equals("1"))
+        {
+            activeStatus = "Project Active";
+        }
+        else
+        {
+            activeStatus = "Project Inactive";
+        }
+        holder.mActiveTextView.setText(activeStatus);
     }
 
     @Override
@@ -78,12 +91,16 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
         public final TextView mFrequencyTextView;
         public final TextView mStartTimeTextView;
         public final TextView mEndTimeTextView;
+        public final TextView mActiveTextView;
+        public int mProjectId;
         public ProjectAdapterViewHolder(View itemView) {
             super(itemView);
+            mProjectId = -1;
             mTitleTextView = (TextView)itemView.findViewById(R.id.title_text_view);
             mFrequencyTextView = (TextView)itemView.findViewById(R.id.frequency_text_view);
             mStartTimeTextView = (TextView)itemView.findViewById(R.id.start_time_text_view);
             mEndTimeTextView = (TextView)itemView.findViewById(R.id.end_time_text_view);
+            mActiveTextView = (TextView) itemView.findViewById(R.id.active_text_view);
             itemView.setOnClickListener(this);
         }
 
@@ -108,6 +125,6 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
                 ,null
         ,null
         ,null
-        ,null);
+        , ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE + " DESC");
     }
 }

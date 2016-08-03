@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
+
     // Whether or not we are in dual-pane mode
     boolean mIsDualPane = false;
     private PendingIntent pendingIntent;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        alarm.checkAlarms(this);
         // setup the recycler view
         mRecyclerView = (RecyclerView)findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(true);
@@ -64,33 +66,12 @@ public class MainActivity extends AppCompatActivity
             public void onClick(ProjectAdapter.ProjectAdapterViewHolder vh) {
                 //start the newProjectActivity
                 Intent intent = new Intent(getApplicationContext(), NewProjectActivity.class);
-                int position = vh.getAdapterPosition();
-
-                intent.putExtra(NewProjectActivity.PROJECT_POSITION, position);
+                intent.putExtra(NewProjectActivity.PROJECT_POSITION, vh.mProjectId);
                 startActivity(intent);
             }
         });
         mRecyclerView.setAdapter(mAdapter);
-
-        alarm.setAlarm(this);
-
     }
-
-//    private void sampleAlarmStart()
-//    {
-//        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//        int interval = 8000;
-//
-//        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
-//        pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
-//
-//        // Set the alarm to start at approximately 2:00 p.m.
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTimeInMillis(System.currentTimeMillis() + interval);
-//
-//        manager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), interval, pendingIntent);
-//        Toast.makeText(this, "Alarm Set", Toast.LENGTH_SHORT).show();
-//    }
 
     @Override
     public void onBackPressed() {

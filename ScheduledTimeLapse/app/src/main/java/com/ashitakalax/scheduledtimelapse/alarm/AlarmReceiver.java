@@ -3,10 +3,12 @@ package com.ashitakalax.scheduledtimelapse.alarm;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.os.PowerManager;
 import android.widget.Toast;
 
@@ -27,7 +29,8 @@ public class AlarmReceiver extends BroadcastReceiver{
             ProjectContract.ProjectEntry.COLUMN_TITLE,
             ProjectContract.ProjectEntry.COLUMN_FREQUENCY,
             ProjectContract.ProjectEntry.COLUMN_START_TIME,
-            ProjectContract.ProjectEntry.COLUMN_END_TIME
+            ProjectContract.ProjectEntry.COLUMN_END_TIME,
+            ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE
     };
 
     // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
@@ -37,6 +40,10 @@ public class AlarmReceiver extends BroadcastReceiver{
     static final int COL_PROJECT_FREQUENCY = 2;
     static final int COL_PROJECT_START_TIME = 3;
     static final int COL_PROJECT_END_TIME = 4;
+    static final int COL_PROJECT_ACTIVE = 5;
+
+    static final String BUNDLE_PROJECT_TITLE = "project_title";
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -45,34 +52,31 @@ public class AlarmReceiver extends BroadcastReceiver{
         wl.acquire();
 
         // Put here YOUR code.
-        Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
+        Toast.makeText(context, " Alarm !!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
 
         // update the next time this specific project will go off next
+        checkAlarms(context);
 
         wl.release();
-
-//        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-//
-//        Intent alarmIntent = new Intent(context, AlarmReceiver.class);
-//        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
-//        manager.cancel(pendingIntent);
-//        Toast.makeText(context, "Alarm Canceled", Toast.LENGTH_SHORT).show();
-        // For our recurring task, we'll just display a message
-//        Toast.makeText(context, "I'm running", Toast.LENGTH_SHORT).show();
     }
 
     /**
      * Checks that alarms are setup to run at the correct time to take a picture
+     * NOTE: This function should be optimized to save on battery
      * @param context
      */
     public void checkAlarms(Context context)
     {
         String sortOrder = ProjectContract.ProjectEntry.COLUMN_START_TIME + "ASC";
+        AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        Intent i = new Intent("alarm.START_ALARM");
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+        am.cancel(pi);
         Cursor cursor = context.getContentResolver().query(ProjectContract.ProjectEntry.CONTENT_URI
         ,null
         ,null
         ,null
-        ,null);
+        , ProjectContract.ProjectEntry.COLUMN_START_TIME + " ASC");
 
         if(cursor == null)
         {
@@ -88,14 +92,24 @@ public class AlarmReceiver extends BroadcastReceiver{
         try {
             while (cursor.moveToNext()) {
 
+                boolean isActive = cursor.getString(COL_PROJECT_ACTIVE).equals("1");
+                if(!isActive)
+                {
+                    // remove from the alarm manager
+                    continue;
+                }
+                int projectId = cursor.getInt(COL_PROJECT_ID);
                 long startTime = cursor.getLong(COL_PROJECT_START_TIME);
                 long endTime = cursor.getLong(COL_PROJECT_END_TIME);
                 float frequency = cursor.getFloat(COL_PROJECT_FREQUENCY);
                 //check if the endTime has already past
                 Calendar endCalendarTime = Calendar.getInstance();
                 endCalendarTime.setTimeInMillis(endTime);
-                if(endCalendarTime.compareTo(now) >= 0)
+                // Expired time
+                if(endCalendarTime.getTimeInMillis() < now.getTimeInMillis())
                 {
+                    // remove alarm, and set alarm to not active, then requery
+                    deactivateAlarm(context, projectId);
                     continue;
                 }
                 // go to the next alarm time
@@ -110,27 +124,17 @@ public class AlarmReceiver extends BroadcastReceiver{
                     startCalendarTime.add(Calendar.MILLISECOND, frequencyIncrement);
                 }
 
-                if(startCalendarTime.compareTo(endCalendarTime) >= 0)
+                if(startCalendarTime.getTimeInMillis() > endCalendarTime.getTimeInMillis())
                 {
                     continue;
                 }
+                i.putExtra(BUNDLE_PROJECT_TITLE, cursor.getString(COL_PROJECT_TITLE));
+                pi = PendingIntent.getBroadcast(context, 0, i, 0);
                 //time is valid to set
-                Times.add(startCalendarTime);
-                increments.add(frequencyIncrement);
+                am.setRepeating(AlarmManager.RTC_WAKEUP, startCalendarTime.getTimeInMillis(), frequencyIncrement, pi); // Millisec * Second * Minute
             }
         } finally {
             cursor.close();
-        }
-
-        //todo sort through all of the arrays
-        //get the next alarm that we need
-        AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        Intent i = new Intent("alarm.START_ALARM");
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
-        for (int j = 0; j < Times.size(); j++) {
-            Calendar alarmCalendar = Times.get(j);
-            int alarmIncrement = increments.get(j);
-            am.setRepeating(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis(), alarmIncrement, pi); // Millisec * Second * Minute
         }
     }
 
@@ -155,6 +159,13 @@ public class AlarmReceiver extends BroadcastReceiver{
 ////        Intent i = new Intent(context, AlarmReceiver.class);
 //        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
 //        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60, pi); // Millisec * Second * Minute
+    }
+    private void deactivateAlarm(Context context, int mProjectId)
+    {
+        ContentValues newProjectValues = new ContentValues();
+
+        newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE, false);
+            context.getContentResolver().update(ProjectContract.ProjectEntry.CONTENT_URI, newProjectValues, ProjectContract.ProjectEntry._ID + "=?",new String[] {String.valueOf(mProjectId)});
     }
 
     public void cancelAlarm(Context context)

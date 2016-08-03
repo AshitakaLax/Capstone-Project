@@ -37,8 +37,12 @@ public class ProjectContract {
 
         // Time Lapse start time
         public static final String COLUMN_START_TIME = "start_time";
+
         // Time Lapse end Time
         public static final String COLUMN_END_TIME = "end_time";
+
+        // whether the alarm is activated
+        public static final String COLUMN_ALARM_ACTIVE = "active";
 
         /**
          * Gets the uri from the id to simplify creating the uri's

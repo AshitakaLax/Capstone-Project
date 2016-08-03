@@ -40,7 +40,7 @@ public class TestUtilities extends AndroidTestCase {
             assertFalse("Column '" + columnName + "' not found. " + error, idx == -1);
             String expectedValue = entry.getValue().toString();
             String actualValue = valueCursor.getString(idx);
-            if (columnName == CameraContract.CameraEntry.COLUMN_FLASH) {
+            if (columnName.equals(CameraContract.CameraEntry.COLUMN_FLASH) || columnName.equals(ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE)) {
 
                 actualValue = (actualValue.equals("1")) ? "true" : "false";
             }
@@ -89,6 +89,8 @@ public class TestUtilities extends AndroidTestCase {
             throw new AssertionFailedError();
         }
         values.put(ProjectContract.ProjectEntry.COLUMN_END_TIME, date.getTime());
+        values.put(ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE, true);
+
         return values;
     }
 
