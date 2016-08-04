@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
+import com.ashitakalax.scheduledtimelapse.controller.CameraController;
 import com.ashitakalax.scheduledtimelapse.views.CameraPreview;
 
 import java.io.File;
@@ -26,9 +27,9 @@ import java.io.IOException;
 public class CameraPreviewActivity extends AppCompatActivity implements Camera.PictureCallback{
 
     static final String TAG = "CAMERA_PREVIEW_ACTIVITY";
+
     private Camera mCamera;
     private CameraPreview mPreview;
-    private Camera.PictureCallback tempCallback;
 
     //todo move all the camera components to another file. since we will need to do this from a alarm clock service.
     @Override
@@ -38,25 +39,25 @@ public class CameraPreviewActivity extends AppCompatActivity implements Camera.P
 
         // Add a listener to the Capture button
         Button captureButton = (Button) findViewById(R.id.button_capture);
-        tempCallback = this;
         captureButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         // get an image from the camera
-                        mCamera.takePicture(null, null, tempCallback);
+                        mCamera.takePicture(null, null, CameraController.handlePictureCallback);
                     }
                 }
         );
 
         //check whether we can get a camera(or if already occupied).
-        if(!checkCameraHardware(this))
-        {
-            // we don't have a camera to use.
-            return;
-        }
-        // Create an instance of Camera
-        mCamera = getCameraInstance();
+//        if(!checkCameraHardware(this))
+//        {
+//            // we don't have a camera to use.
+//            return;
+//        }
+//        // Create an instance of Camera
+//        mCamera = getCameraInstance();
+        mCamera = CameraController.getCameraInstance(this);
 
         if(mCamera != null) {
             // Create our Preview view and set it as the content of our activity.
@@ -66,37 +67,36 @@ public class CameraPreviewActivity extends AppCompatActivity implements Camera.P
         }
     }
 
-
-
-    /** A safe way to get an instance of the Camera object. */
-    public static Camera getCameraInstance(){
-        Camera c = null;
-        try {
-            c = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK); // attempt to get a Camera instance
-        }
-        catch (Exception e){
-            // Camera is not available (in use or does not exist)
-            Log.e("CAMERA_OPEN", "Failed to open Camera" + e.getMessage());
-        }
-        return c; // returns null if camera is unavailable
-    }
-
-    /** Check if this device has a camera */
-    private boolean checkCameraHardware(Context context) {
-        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
-            // this device has a camera
-            return true;
-        } else {
-            // no camera on this device
-            return false;
-        }
-    }
+//
+//
+//    /** A safe way to get an instance of the Camera object. */
+//    public static Camera getCameraInstance(){
+//        Camera c = null;
+//        try {
+//            c = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK); // attempt to get a Camera instance
+//        }
+//        catch (Exception e){
+//            // Camera is not available (in use or does not exist)
+//            Log.e("CAMERA_OPEN", "Failed to open Camera" + e.getMessage());
+//        }
+//        return c; // returns null if camera is unavailable
+//    }
+//
+//    /** Check if this device has a camera */
+//    private boolean checkCameraHardware(Context context) {
+//        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+//            // this device has a camera
+//            return true;
+//        } else {
+//            // no camera on this device
+//            return false;
+//        }
+//    }
 
     @Override
     public void onPictureTaken(byte[] bytes, Camera camera) {
 
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes , 0, bytes.length);
-
 
         if (bitmap == null){
             Log.d(TAG, "Error creating media file, check storage permissions: ");
