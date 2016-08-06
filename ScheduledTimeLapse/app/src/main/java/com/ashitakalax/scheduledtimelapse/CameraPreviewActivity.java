@@ -8,8 +8,11 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
@@ -30,33 +33,20 @@ public class CameraPreviewActivity extends AppCompatActivity implements Camera.P
 
     private Camera mCamera;
     private CameraPreview mPreview;
+    private View mDecorView;
 
     //todo move all the camera components to another file. since we will need to do this from a alarm clock service.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.camera_preview);
 
-        // Add a listener to the Capture button
-        Button captureButton = (Button) findViewById(R.id.button_capture);
-        captureButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // get an image from the camera
-                        mCamera.takePicture(null, null, CameraController.handlePictureCallback);
-                    }
-                }
-        );
-
         //check whether we can get a camera(or if already occupied).
-//        if(!checkCameraHardware(this))
-//        {
-//            // we don't have a camera to use.
-//            return;
-//        }
-//        // Create an instance of Camera
-//        mCamera = getCameraInstance();
         mCamera = CameraController.getCameraInstance(this);
 
         if(mCamera != null) {
@@ -67,31 +57,37 @@ public class CameraPreviewActivity extends AppCompatActivity implements Camera.P
         }
     }
 
-//
-//
-//    /** A safe way to get an instance of the Camera object. */
-//    public static Camera getCameraInstance(){
-//        Camera c = null;
-//        try {
-//            c = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK); // attempt to get a Camera instance
-//        }
-//        catch (Exception e){
-//            // Camera is not available (in use or does not exist)
-//            Log.e("CAMERA_OPEN", "Failed to open Camera" + e.getMessage());
-//        }
-//        return c; // returns null if camera is unavailable
-//    }
-//
-//    /** Check if this device has a camera */
-//    private boolean checkCameraHardware(Context context) {
-//        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
-//            // this device has a camera
-//            return true;
-//        } else {
-//            // no camera on this device
-//            return false;
-//        }
-//    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mCamera.release();
+    }
+
+
+
+    // This snippet hides the system bars.
+    private void hideSystemUI() {
+        // Set the IMMERSIVE flag.
+        // Set the content to appear under the system bars so that the content
+        // doesn't resize when the system bars hide and show.
+        mDecorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE);
+    }
+
+    // This snippet shows the system bars. It does this by removing all the flags
+    // except for the ones that make the content appear under the system bars.
+    private void showSystemUI() {
+
+        mDecorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+    }
 
     @Override
     public void onPictureTaken(byte[] bytes, Camera camera) {

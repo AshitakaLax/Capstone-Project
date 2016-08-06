@@ -195,7 +195,8 @@ public class AlarmReceiver extends BroadcastReceiver{
     {
         String sortOrder = ProjectContract.ProjectEntry.COLUMN_START_TIME + "ASC";
         AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        Intent cancelIntent = new Intent("alarm.START_ALARM");
+//        Intent cancelIntent = new Intent("alarm.START_ALARM");
+        Intent cancelIntent = new Intent(context,AlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, cancelIntent, 0);
         am.cancel(pi);
         Cursor cursor = context.getContentResolver().query(ProjectContract.ProjectEntry.CONTENT_URI
