@@ -14,12 +14,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.PublicKey;
 
 /**
  * Created by lballing on 7/26/2016.
  * this will use AndDown to render markup to  simplify formatting the user manual
  */
 public class UserManualActivity extends AppCompatActivity {
+
+    private String userManualUrl = "https://raw.githubusercontent.com/AshitakaLax/Capstone-Project/master/README.md";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

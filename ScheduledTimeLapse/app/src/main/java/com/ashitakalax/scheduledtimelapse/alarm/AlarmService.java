@@ -19,7 +19,7 @@ public class AlarmService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         alarm.setAlarm(this);
-        return START_STICKY;
+        return START_REDELIVER_INTENT;
 //        return super.onStartCommand(intent, flags, startId);
     }
 
