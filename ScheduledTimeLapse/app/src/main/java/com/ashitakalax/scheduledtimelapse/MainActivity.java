@@ -1,13 +1,11 @@
 package com.ashitakalax.scheduledtimelapse;
 
-import android.content.Context;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.AttributeSet;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,6 +18,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.ashitakalax.scheduledtimelapse.adapter.ProjectAdapter;
+import com.ashitakalax.scheduledtimelapse.alarm.AlarmReceiver;
+
 // todo update this activity to be a fragment
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener{
@@ -28,8 +28,11 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
+
     // Whether or not we are in dual-pane mode
     boolean mIsDualPane = false;
+    private PendingIntent pendingIntent;
+    private AlarmReceiver alarm = new AlarmReceiver();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        alarm.checkAlarms(this);
         // setup the recycler view
         mRecyclerView = (RecyclerView)findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(true);
@@ -60,11 +64,13 @@ public class MainActivity extends AppCompatActivity
         mAdapter = new ProjectAdapter(this, new ProjectAdapter.ProjectAdapterOnClickHandler() {
             @Override
             public void onClick(ProjectAdapter.ProjectAdapterViewHolder vh) {
-
+                //start the newProjectActivity
+                Intent intent = new Intent(getApplicationContext(), NewProjectActivity.class);
+                intent.putExtra(NewProjectActivity.PROJECT_POSITION, vh.mProjectId);
+                startActivity(intent);
             }
         });
         mRecyclerView.setAdapter(mAdapter);
-
     }
 
     @Override
@@ -138,6 +144,7 @@ public class MainActivity extends AppCompatActivity
     public void onClick(View view) {
         // goto new fragment to create a new project with all of it's settings
         Intent intent = new Intent(this, NewProjectActivity.class);
+        intent.putExtra(NewProjectActivity.PROJECT_POSITION, -1);
         startActivity(intent);
     }
 }

@@ -92,6 +92,18 @@
 
     </LinearLayout>
 
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Activate Project"
+        android:id="@+id/projectActiveSwitch"
+        android:layout_gravity="right"
+        android:layout_marginRight="10dp"
+        android:showText="false"
+        android:singleLine="false"
+        android:splitTrack="false"
+        android:switchPadding="20dp" />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

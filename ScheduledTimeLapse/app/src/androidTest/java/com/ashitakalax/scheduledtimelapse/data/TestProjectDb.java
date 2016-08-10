@@ -65,6 +65,7 @@ public class TestProjectDb extends AndroidTestCase {
         ProjectColumnHashSet.add(ProjectContract.ProjectEntry.COLUMN_FREQUENCY);
         ProjectColumnHashSet.add(ProjectContract.ProjectEntry.COLUMN_START_TIME);
         ProjectColumnHashSet.add(ProjectContract.ProjectEntry.COLUMN_END_TIME);
+        ProjectColumnHashSet.add(ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE);
 
         int columnNameIndex = c.getColumnIndex("name");
         do {

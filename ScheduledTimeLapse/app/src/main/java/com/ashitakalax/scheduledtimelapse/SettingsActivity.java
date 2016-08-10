@@ -38,12 +38,12 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         for (int i = 0; i < spinnerArray.size(); i++) {
             Spinner spinner = (Spinner)findViewById(spinnerArray.keyAt(i));
             String value = spinnerArray.valueAt(i);
-            List<String> options = CameraController.getCameraOptions(value);
+            List<String> options = CameraController.getCameraOptions(this,value);
             if(options.size() != 0) {
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, options);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
-                String currentOption = CameraController.getCameraOption(value.substring(0, value.lastIndexOf('-')));
+                String currentOption = CameraController.getCameraOption(this, value.substring(0, value.lastIndexOf('-')));
                 int currentIndex = adapter.getPosition(currentOption);
                 spinner.setSelection(currentIndex);
                 spinner.setOnItemSelectedListener(this);
@@ -68,7 +68,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         String item = adapterView.getItemAtPosition(position).toString();
         String optionType = spinnerArray.get(view.getId());
         optionType = optionType.substring(0, optionType.lastIndexOf('-'));//removes -values
-        CameraController.setCameraOption(optionType, item);
+        CameraController.setCameraOption(this, optionType, item);
     }
 
     @Override
