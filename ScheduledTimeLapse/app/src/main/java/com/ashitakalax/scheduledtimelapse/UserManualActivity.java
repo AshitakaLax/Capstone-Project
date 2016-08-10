@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.ashitakalax.scheduledtimelapse.data.FetchUsermanualTask;
 import com.ashitakalax.scheduledtimelapse.utils.NetworkingUtils;
+import com.ashitakalax.scheduledtimelapse.utils.Utility;
 import com.commonsware.cwac.anddown.AndDown;
 
 import org.w3c.dom.Text;
@@ -41,52 +42,43 @@ public class UserManualActivity extends AppCompatActivity implements FetchUserma
         if(NetworkingUtils.isNetworkAvailable(this))
         {
             new FetchUsermanualTask(this).execute(userManualUrl);
+            return;
         }
         else
         {
             //todo we need to revert to a previous version of the usermanual already stored on the phone in a key Value Pair
-            userManualRaw = readRawTextFile(this, R.raw.readme);
+            userManualRaw  = Utility.getLatestUserManualFile(this);
         }
 
         AndDown convert = new AndDown();
 
         String cooked = convert.markdownToHtml(userManualRaw);
 
-        CharSequence charSequence = Html.fromHtml(cooked);
+        CharSequence formatted = Html.fromHtml(cooked);
 
-    }
-
-    /**
-     * This function is here just in case I want to store the default user manual, if there never is an internet connection
-     * @param ctx context
-     * @param resId resource Id
-     * @return string from the text file
-     */
-    public static String readRawTextFile(Context ctx, int resId) {
-        InputStream inputStream=ctx.getResources().openRawResource(resId);
-        InputStreamReader inputreader=new InputStreamReader(inputStream);
-        BufferedReader buffreader=new BufferedReader(inputreader);
-        String line;
-        StringBuilder text=new StringBuilder();
-
-        try {
-            while ((line=buffreader.readLine())!=null) {
-                text.append(line);
-                text.append('\n');
-            }
-        }
-        catch (IOException e) {
-            return null;
-        }
-        return text.toString();
+        mUserManualTextView.setText(formatted);
     }
 
     /**
      * This will be the converted CharSequence that we need to display on the UI
-     * @param sequence formatted Char Sequence
+     * @param raw raw string from the fetch
+     * @param formatted formatted Char Sequence
      */
     @Override
-    public void OnUserManualReceived(CharSequence sequence) {
-        mUserManualTextView.setText(sequence);
+    public void OnUserManualReceived(String raw, CharSequence formatted) {
+        Utility.setLatestUserManualFile(this, raw);
+        mUserManualTextView.setText(formatted);
+    }
+
+    @Override
+    public void OnUserManualFailedFetch() {
+
+        //todo we need to revert to a previous version of the usermanual already stored on the phone in a key Value Pair
+        String userManualRaw  = Utility.getLatestUserManualFile(this);
+        AndDown convert = new AndDown();
+
+        String cooked = convert.markdownToHtml(userManualRaw);
+
+        CharSequence charSequence = Html.fromHtml(cooked);
     }
 }

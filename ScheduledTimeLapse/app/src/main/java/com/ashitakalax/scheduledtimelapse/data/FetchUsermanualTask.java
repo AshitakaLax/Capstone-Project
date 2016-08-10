@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
 
+import com.ashitakalax.scheduledtimelapse.utils.Utility;
 import com.commonsware.cwac.anddown.AndDown;
 
 import java.io.BufferedReader;
@@ -22,7 +23,9 @@ public class FetchUsermanualTask extends AsyncTask<String, Void, CharSequence> {
     private final String TAG = this.getClass().getSimpleName();
 
     public interface OnUserManualReceiveInterface{
-        void OnUserManualReceived(CharSequence sequence);
+        void OnUserManualReceived(String rawManual, CharSequence formattedCharSequence);
+
+        void OnUserManualFailedFetch();
     }
 
     public FetchUsermanualTask(OnUserManualReceiveInterface userManualCallback)
@@ -31,10 +34,12 @@ public class FetchUsermanualTask extends AsyncTask<String, Void, CharSequence> {
         {
             throw new IllegalArgumentException("userManualCallback can't be null");
         }
+        this.mRawUserManual = null;
         this.mUserManualCallback = userManualCallback;
     }
 
     private OnUserManualReceiveInterface mUserManualCallback;
+    private String mRawUserManual;
 
     /**
      * This is where we fetch the json String
@@ -45,7 +50,6 @@ public class FetchUsermanualTask extends AsyncTask<String, Void, CharSequence> {
     protected CharSequence doInBackground(String... urlTarget) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
-        String userManualStr = null;
         if(this.mUserManualCallback == null)
         {
             return null;
@@ -78,7 +82,7 @@ public class FetchUsermanualTask extends AsyncTask<String, Void, CharSequence> {
                 // Stream was empty.  No point in parsing.
                 return "";
             }
-            userManualStr = buffer.toString();
+            this.mRawUserManual = buffer.toString();
         }
         catch (Exception ex)
         {
@@ -95,11 +99,12 @@ public class FetchUsermanualTask extends AsyncTask<String, Void, CharSequence> {
                 }
             }
         }
+        //store the latest string in preferences
         // convert the raw markdown text into html, then to a character sequence to be displayed
 
         AndDown convert = new AndDown();
 
-        String cooked = convert.markdownToHtml(userManualStr);
+        String cooked = convert.markdownToHtml( this.mRawUserManual);
 
         CharSequence charSequence = Html.fromHtml(cooked);
 
@@ -108,15 +113,19 @@ public class FetchUsermanualTask extends AsyncTask<String, Void, CharSequence> {
 
     /**
      * The data has come back, and we want to just forward that data on
-     * @param s
+     * @param formattedSequence
      */
     @Override
-    protected void onPostExecute(CharSequence s) {
-        super.onPostExecute(s);
+    protected void onPostExecute(CharSequence formattedSequence) {
+        super.onPostExecute(formattedSequence);
         if(this.mUserManualCallback == null)
         {
             return;
         }
-        this.mUserManualCallback.OnUserManualReceived(s);
+        if(formattedSequence == null)
+        {
+            this.mUserManualCallback.OnUserManualFailedFetch();
+        }
+        this.mUserManualCallback.OnUserManualReceived(this.mRawUserManual, formattedSequence);
     }
 }
