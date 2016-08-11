@@ -4,17 +4,17 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.ashitakalax.scheduledtimelapse.adapter.ProjectAdapter;
@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity
     // Whether or not we are in dual-pane mode
     boolean mIsDualPane = false;
     private PendingIntent pendingIntent;
+    AdSupport mAdSupport;
     private AlarmReceiver alarm = new AlarmReceiver();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,11 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         alarm.checkAlarms(this);
+        // setup ads if free
+        this.mAdSupport = new AdSupport();
+        View tempParentView = findViewById(R.id.my_main_content);
+        this.mAdSupport.handleOnCreate(this, tempParentView);
+
         // setup the recycler view
         mRecyclerView = (RecyclerView)findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(true);
