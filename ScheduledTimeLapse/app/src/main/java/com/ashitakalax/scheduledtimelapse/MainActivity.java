@@ -2,9 +2,13 @@ package com.ashitakalax.scheduledtimelapse;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -18,16 +22,37 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.ashitakalax.scheduledtimelapse.adapter.ProjectAdapter;
+import com.ashitakalax.scheduledtimelapse.adapter.ProjectCursorAdapter;
 import com.ashitakalax.scheduledtimelapse.alarm.AlarmReceiver;
+import com.ashitakalax.scheduledtimelapse.data.ProjectContract;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 // todo update this activity to be a fragment
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener{
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final String[] PROJECT_COLUMNS = {
+            ProjectContract.ProjectEntry.TABLE_NAME + "." + ProjectContract.ProjectEntry._ID,
+            ProjectContract.ProjectEntry.COLUMN_TITLE,
+            ProjectContract.ProjectEntry.COLUMN_FREQUENCY,
+            ProjectContract.ProjectEntry.COLUMN_START_TIME,
+            ProjectContract.ProjectEntry.COLUMN_END_TIME,
+            ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE
+    };
+
+    // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
+    // must change.
+    static final int COL_PROJECT_ID = 0;
+    static final int COL_PROJECT_TITLE = 1;
+    static final int COL_PROJECT_FREQUENCY = 2;
+    static final int COL_PROJECT_START_TIME = 3;
+    static final int COL_PROJECT_END_TIME = 4;
+    static final int COL_PROJECT_ACTIVE = 5;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private ProjectCursorAdapter mCursorAdapter;
 
 
     // Whether or not we are in dual-pane mode
@@ -36,6 +61,7 @@ public class MainActivity extends AppCompatActivity
     AdSupport mAdSupport;
     private FirebaseAnalytics mFirebaseAnalytics;
     private AlarmReceiver alarm = new AlarmReceiver();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,15 +85,15 @@ public class MainActivity extends AppCompatActivity
         alarm.checkAlarms(this);
         // setup ads if free
         this.mAdSupport = new AdSupport();
-        View adView = (View)findViewById(R.id.ad_view);
-        if(adView != null) {
+        View adView = (View) findViewById(R.id.ad_view);
+        if (adView != null) {
             this.mAdSupport.handleOnCreate(this, adView);
         }
 
         this.mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         // setup the recycler view
-        mRecyclerView = (RecyclerView)findViewById(R.id.my_recycler_view);
+        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout Manager
@@ -83,6 +109,12 @@ public class MainActivity extends AppCompatActivity
             }
         });
         mRecyclerView.setAdapter(mAdapter);
+
+        //This is the cursor adapter implementation
+        mCursorAdapter = new ProjectCursorAdapter(this, null, 0);
+        //change the recycle view to be just a list view
+        //this.mListView.setAdapter(mCursorAdapter);
+
     }
 
     @Override
@@ -142,7 +174,7 @@ public class MainActivity extends AppCompatActivity
 
             bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "gallery");
             mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-            ((TextView)this.findViewById(R.id.textView)).setText("TODO open gallery");
+            ((TextView) this.findViewById(R.id.textView)).setText("TODO open gallery");
 
         } else if (id == R.id.nav_user_manual) {
 
@@ -167,7 +199,7 @@ public class MainActivity extends AppCompatActivity
         // goto new fragment to create a new project with all of it's settings
 
         Bundle bundle = new Bundle();
-        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, R.id.fab +"");
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, R.id.fab + "");
         bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "fab");
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "newProject");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
@@ -176,4 +208,22 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra(NewProjectActivity.PROJECT_POSITION, -1);
         startActivity(intent);
     }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        return new CursorLoader(this, ProjectContract.ProjectEntry.CONTENT_URI, null, null, null, ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE + " DESC");
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        this.mCursorAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        this.mCursorAdapter.swapCursor(null);
+
+    }
 }
+
