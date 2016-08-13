@@ -14,6 +14,7 @@ import com.ashitakalax.scheduledtimelapse.data.ProjectContract;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by lballing on 7/21/2016.
@@ -25,7 +26,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
     final private Context mContext;
     final private ProjectAdapterOnClickHandler mClickHandler;
     // todo add the date and time formatters to a constants in utilities
-    private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("EEE, MMM d, yyyy  hh:mm aaa");
+    private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("EEE, MMM d, yyyy  hh:mm aaa", Locale.US);
 
     private static final String[] PROJECT_COLUMNS = {
         ProjectContract.ProjectEntry.TABLE_NAME + "." + ProjectContract.ProjectEntry._ID,

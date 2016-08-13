@@ -14,6 +14,9 @@
     <string name="navigation_gallery">Gallery</string>
     <string name="navigation_user_manual">User\'s Manual</string>
     <string name="navigation_new_photo_project">New Photo Project</string>
+    <string name="nav_drawer_communicate">Communicate</string>
+    <string name="nav_drawer_rate_this_app">Rate this app</string>
+    <string name="nav_user_name">User Name</string>
 
     <!--Project Activity-->
     <string name="project_main_name">New Project</string>
@@ -23,4 +26,21 @@
     <string name="file_format">File Format</string>
     <string name="focus">Focus</string>
     <string name="flash">Flash</string>
+    <string name="card_subtitle_frequency">0hz</string>
+    <string name="card_subtitle_start">0am</string>
+    <string name="card_subtitle_end">0pm</string>
+    <string name="card_subtitle_active">Active</string>
+    <string name="card_subtitle_inactive">Inactive</string>
+
+    <!--New Project-->
+    <string name="datetime_row_title">Title</string>
+    <string name="new_project_title">Title</string>
+    <string name="new_project_frequency">Frequency</string>
+    <string name="new_project_sample_date">Tue, Jul 24, 2016</string>
+    <string name="new_project_sample_time">12:12 pm</string>
+
+
+    <!--Content Description Strings-->
+    <string name="nav_header_image_cd">App Icon</string>
+    <string name="nav_user_email">User_email@email.com</string>
 </resources>

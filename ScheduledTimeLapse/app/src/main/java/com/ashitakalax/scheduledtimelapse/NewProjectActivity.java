@@ -23,6 +23,7 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by lballing on 7/22/2016.
@@ -63,8 +64,8 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     private int mProjectPosition;
     private int mProjectId;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy");
-    private SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm aaa");//todo update to have second precision
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy", Locale.US);
+    private SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm aaa", Locale.US);//todo update to have second precision
 
     //todo abstract each of these items into it's own class with formatting integrated into it.
     private DatePickerDialog.OnDateSetListener startDateSetListener = new DatePickerDialog.OnDateSetListener() {

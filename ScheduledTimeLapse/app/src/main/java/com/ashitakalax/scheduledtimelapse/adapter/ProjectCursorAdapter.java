@@ -7,6 +7,7 @@ import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -14,6 +15,7 @@ import com.ashitakalax.scheduledtimelapse.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by lballing on 8/12/2016.
@@ -28,7 +30,7 @@ public class ProjectCursorAdapter extends CursorAdapter {
     static final int COL_PROJECT_END_TIME = 4;
     static final int COL_PROJECT_ACTIVE = 5;
 
-    private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("EEE, MMM d, yyyy  hh:mm aaa");
+    private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("EEE, MMM d, yyyy  hh:mm aaa", Locale.US);
 
 
     public ProjectCursorAdapter(Context context, Cursor c, int flags)
@@ -52,6 +54,17 @@ public class ProjectCursorAdapter extends CursorAdapter {
         TextView endTimeTextView = (TextView)view.findViewById(R.id.end_time_text_view);
 //        TextView activeTextView = (TextView) view.findViewById(R.id.active_text_view);
         Switch activeSwitch = (Switch) view.findViewById(R.id.projectActiveSwitch);
+        activeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b) {
+                    compoundButton.setText(R.string.card_subtitle_active);
+                }
+                else {
+                    compoundButton.setText(R.string.card_subtitle_inactive);
+                }
+            }
+        });
         // todo add image to cardview(either default or one that is part of the set)
         //holder.mProjectId = mCursor.getInt(COL_PROJECT_ID);
         titleTextView.setText(mCursor.getString(COL_PROJECT_TITLE));
@@ -64,13 +77,13 @@ public class ProjectCursorAdapter extends CursorAdapter {
             activeSwitch.setChecked(true);
             cardView.setElevation(R.dimen.card_raised_elevation);
 
-            activeStatus = "Project Active";
+            activeStatus = "Active";
         }
         else
         {
             cardView.setElevation(R.dimen.cardview_default_elevation);
-            activeSwitch.setChecked(true);
-            activeStatus = "Project Inactive";
+            activeSwitch.setChecked(false);
+            activeStatus = "Inactive";
         }
         activeSwitch.setText(activeStatus);
 //        activeTextView.setText(activeStatus);
