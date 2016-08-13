@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.ashitakalax.scheduledtimelapse.adapter.ProjectAdapter;
 import com.ashitakalax.scheduledtimelapse.alarm.AlarmReceiver;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 // todo update this activity to be a fragment
 public class MainActivity extends AppCompatActivity
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity
     boolean mIsDualPane = false;
     private PendingIntent pendingIntent;
     AdSupport mAdSupport;
+    private FirebaseAnalytics mFirebaseAnalytics;
     private AlarmReceiver alarm = new AlarmReceiver();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +59,12 @@ public class MainActivity extends AppCompatActivity
         alarm.checkAlarms(this);
         // setup ads if free
         this.mAdSupport = new AdSupport();
-        View tempParentView = findViewById(R.id.my_main_content);
-        this.mAdSupport.handleOnCreate(this, tempParentView);
+        View adView = (View)findViewById(R.id.ad_view);
+        if(adView != null) {
+            this.mAdSupport.handleOnCreate(this, adView);
+        }
+
+        this.mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         // setup the recycler view
         mRecyclerView = (RecyclerView)findViewById(R.id.my_recycler_view);
@@ -120,19 +126,29 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, id + "");
+        bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "option");
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "CameraPreview");
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
             // start the CamerPreview activity
             Intent intent = new Intent(this, CameraPreviewActivity.class);
             startActivity(intent);
             return true;
         } else if (id == R.id.nav_gallery) {
+
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "gallery");
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
             ((TextView)this.findViewById(R.id.textView)).setText("TODO open gallery");
 
         } else if (id == R.id.nav_user_manual) {
 
             // start the User Manual activity
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "userManual");
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
             Intent intent = new Intent(this, UserManualActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_share) {
@@ -149,6 +165,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View view) {
         // goto new fragment to create a new project with all of it's settings
+
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, R.id.fab +"");
+        bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "fab");
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "newProject");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
         Intent intent = new Intent(this, NewProjectActivity.class);
         intent.putExtra(NewProjectActivity.PROJECT_POSITION, -1);
         startActivity(intent);

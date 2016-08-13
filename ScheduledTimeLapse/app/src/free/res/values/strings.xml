@@ -2,5 +2,6 @@
 <resources>
 
     <!-- This is an ad unit ID for a test ad. Replace with your own banner ad unit id. -->
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="admob_app_id">ca-app-pub-1796499246127463~7235841830</string>
+    <string name="banner_ad_unit_id">ca-app-pub-1796499246127463/8712575033</string>
 </resources>

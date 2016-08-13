@@ -19,17 +19,18 @@ public class AdSupport {
 
     }
 
-    public void handleOnCreate(Context context, View parentView)
+    public void handleOnCreate(Context context, View adView)
     {
-
         //todo pull the string from my publisher value
-        MobileAds.initialize(context, "ca-app-pub-3940256099942544~3347511713");
-        this.mAdView = (AdView)parentView.findViewById(R.id.ad_view);
+        String adModUnitId = context.getResources().getString(R.string.admob_app_id);
+        MobileAds.initialize(context, adModUnitId);
+        this.mAdView = (AdView)adView;//.findViewById(R.id.ad_view);
 
         // Create an ad request. Check your logcat output for the hashed device ID to
         // get test ads on a physical device. e.g.
         // "Use AdRequest.Builder.addTestDevice("ABCDEF012345") to get test ads on this device."
         AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
 
         // Start loading the ad in the background.

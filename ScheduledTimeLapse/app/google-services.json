@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "365247791071",
+    "firebase_url": "https://scheduletimelapse.firebaseio.com",
+    "project_id": "scheduletimelapse",
+    "storage_bucket": "scheduletimelapse.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:365247791071:android:f78b010329056009",
+        "android_client_info": {
+          "package_name": "com.ashitakalax.scheduledtimelapse"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "365247791071-3g6kieah080i3uapjbl919qjgo26ijfh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAl66mPe-uAa3-VoTJrKmvgriF8pOzyb3A"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
