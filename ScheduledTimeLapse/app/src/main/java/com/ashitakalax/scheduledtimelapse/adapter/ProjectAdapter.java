@@ -76,7 +76,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
         {
             activeStatus = "Project Inactive";
         }
-        holder.mActiveTextView.setText(activeStatus);
+        //holder.mActiveTextView.setText(activeStatus);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
         public final TextView mFrequencyTextView;
         public final TextView mStartTimeTextView;
         public final TextView mEndTimeTextView;
-        public final TextView mActiveTextView;
+        //public final TextView mActiveTextView;
         public int mProjectId;
         public ProjectAdapterViewHolder(View itemView) {
             super(itemView);
@@ -100,7 +100,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
             mFrequencyTextView = (TextView)itemView.findViewById(R.id.frequency_text_view);
             mStartTimeTextView = (TextView)itemView.findViewById(R.id.start_time_text_view);
             mEndTimeTextView = (TextView)itemView.findViewById(R.id.end_time_text_view);
-            mActiveTextView = (TextView) itemView.findViewById(R.id.active_text_view);
+            //mActiveTextView = (TextView) itemView.findViewById(R.id.);
             itemView.setOnClickListener(this);
         }
 

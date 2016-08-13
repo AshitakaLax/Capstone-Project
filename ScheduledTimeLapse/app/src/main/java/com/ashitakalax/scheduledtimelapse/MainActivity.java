@@ -128,8 +128,14 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                    if (cursor != null) {
+                    if (cursor != null)
+                    {
 
+                        int projectId = cursor.getInt(COL_PROJECT_ID);
+
+                        Intent intent = new Intent(getApplicationContext(), NewProjectActivity.class);
+                        intent.putExtra(NewProjectActivity.PROJECT_POSITION, projectId);
+                        startActivity(intent);
                         //Long movieId = (long) cursor.getInt(COL_MOVIE_ID);
 //
 //                        try{

@@ -5,7 +5,7 @@ android {
     buildToolsVersion '24.0.1'
     defaultConfig {
         applicationId "com.ashitakalax.scheduledtimelapse"
-        minSdkVersion 18
+        minSdkVersion 21
         targetSdkVersion 24
         versionName '1.0.0'
     }
@@ -41,7 +41,6 @@ repositories {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-
     freeCompile 'com.google.android.gms:play-services-ads:9.4.0'
     compile 'com.google.firebase:firebase-core:9.4.0'
     compile 'com.android.support:appcompat-v7:24.1.1'

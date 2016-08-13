@@ -3,9 +3,11 @@ package com.ashitakalax.scheduledtimelapse.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.ashitakalax.scheduledtimelapse.R;
@@ -43,12 +45,13 @@ public class ProjectCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
 
+        CardView cardView = (CardView)view.findViewById(R.id.card_view);
         TextView titleTextView = (TextView)view.findViewById(R.id.title_text_view);
         TextView frequencyTextView = (TextView)view.findViewById(R.id.frequency_text_view);
         TextView startTimeTextView = (TextView)view.findViewById(R.id.start_time_text_view);
         TextView endTimeTextView = (TextView)view.findViewById(R.id.end_time_text_view);
-        TextView activeTextView = (TextView) view.findViewById(R.id.active_text_view);
-
+//        TextView activeTextView = (TextView) view.findViewById(R.id.active_text_view);
+        Switch activeSwitch = (Switch) view.findViewById(R.id.projectActiveSwitch);
         // todo add image to cardview(either default or one that is part of the set)
         //holder.mProjectId = mCursor.getInt(COL_PROJECT_ID);
         titleTextView.setText(mCursor.getString(COL_PROJECT_TITLE));
@@ -58,13 +61,19 @@ public class ProjectCursorAdapter extends CursorAdapter {
         String activeStatus;
         if(mCursor.getString(COL_PROJECT_ACTIVE).equals("1"))
         {
+            activeSwitch.setChecked(true);
+            cardView.setElevation(R.dimen.card_raised_elevation);
+
             activeStatus = "Project Active";
         }
         else
         {
+            cardView.setElevation(R.dimen.cardview_default_elevation);
+            activeSwitch.setChecked(true);
             activeStatus = "Project Inactive";
         }
-        activeTextView.setText(activeStatus);
+        activeSwitch.setText(activeStatus);
+//        activeTextView.setText(activeStatus);
 
     }
 }
