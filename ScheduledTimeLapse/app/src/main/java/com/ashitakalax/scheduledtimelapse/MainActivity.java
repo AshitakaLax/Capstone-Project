@@ -19,6 +19,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.ashitakalax.scheduledtimelapse.adapter.ProjectAdapter;
@@ -31,6 +33,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final int PROJECT_LOADER = 0;
     private static final String[] PROJECT_COLUMNS = {
             ProjectContract.ProjectEntry.TABLE_NAME + "." + ProjectContract.ProjectEntry._ID,
             ProjectContract.ProjectEntry.COLUMN_TITLE,
@@ -52,8 +55,9 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private ProjectCursorAdapter mCursorAdapter;
 
+    private ProjectCursorAdapter mCursorAdapter;
+    private ListView mListView;
 
     // Whether or not we are in dual-pane mode
     boolean mIsDualPane = false;
@@ -93,28 +97,60 @@ public class MainActivity extends AppCompatActivity
         this.mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         // setup the recycler view
-        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-        mRecyclerView.setHasFixedSize(true);
+        if(false) {
+            mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+            mRecyclerView.setHasFixedSize(true);
 
-        // use a linear layout Manager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new ProjectAdapter(this, new ProjectAdapter.ProjectAdapterOnClickHandler() {
-            @Override
-            public void onClick(ProjectAdapter.ProjectAdapterViewHolder vh) {
-                //start the newProjectActivity
-                Intent intent = new Intent(getApplicationContext(), NewProjectActivity.class);
-                intent.putExtra(NewProjectActivity.PROJECT_POSITION, vh.mProjectId);
-                startActivity(intent);
-            }
-        });
-        mRecyclerView.setAdapter(mAdapter);
+            // use a linear layout Manager
+            mLayoutManager = new LinearLayoutManager(this);
+            mRecyclerView.setLayoutManager(mLayoutManager);
+            mAdapter = new ProjectAdapter(this, new ProjectAdapter.ProjectAdapterOnClickHandler() {
+                @Override
+                public void onClick(ProjectAdapter.ProjectAdapterViewHolder vh) {
+                    //start the newProjectActivity
+                    Intent intent = new Intent(getApplicationContext(), NewProjectActivity.class);
+                    intent.putExtra(NewProjectActivity.PROJECT_POSITION, vh.mProjectId);
+                    startActivity(intent);
+                }
+            });
+            mRecyclerView.setAdapter(mAdapter);
+        }
+        else
+        {
+            //listView approach
+            mListView = (ListView)findViewById(R.id.my_list_view);
+            //This is the cursor adapter implementation
 
-        //This is the cursor adapter implementation
-        mCursorAdapter = new ProjectCursorAdapter(this, null, 0);
-        //change the recycle view to be just a list view
-        //this.mListView.setAdapter(mCursorAdapter);
+            mCursorAdapter = new ProjectCursorAdapter(this, null, 0);
+            //change the recycle view to be just a list view
+            this.mListView.setAdapter(mCursorAdapter);
+            this.mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                    if (cursor != null) {
 
+                        //Long movieId = (long) cursor.getInt(COL_MOVIE_ID);
+//
+//                        try{
+//                            ((OnMovieSelected) mMainActivity).onMovieSelected(movieId);
+//                        }catch (ClassCastException cce){
+//
+//                        }
+                    }
+                }
+            });
+
+            LoaderManager manager = this.getSupportLoaderManager();
+            manager.initLoader(PROJECT_LOADER, null, this);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LoaderManager manager = this.getSupportLoaderManager();
+        manager.restartLoader(PROJECT_LOADER, null, this);
     }
 
     @Override
@@ -212,7 +248,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        return new CursorLoader(this, ProjectContract.ProjectEntry.CONTENT_URI, null, null, null, ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE + " DESC");
+        Loader<Cursor> cursorLoader = new CursorLoader(this, ProjectContract.ProjectEntry.CONTENT_URI, null, null, null, ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE + " DESC");
+        return  cursorLoader;
     }
 
     @Override
@@ -225,5 +262,6 @@ public class MainActivity extends AppCompatActivity
         this.mCursorAdapter.swapCursor(null);
 
     }
+
 }
 
