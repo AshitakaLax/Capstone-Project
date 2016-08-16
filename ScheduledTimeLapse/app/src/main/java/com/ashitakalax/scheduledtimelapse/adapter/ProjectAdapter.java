@@ -14,6 +14,7 @@ import com.ashitakalax.scheduledtimelapse.data.ProjectContract;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by lballing on 7/21/2016.
@@ -25,7 +26,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
     final private Context mContext;
     final private ProjectAdapterOnClickHandler mClickHandler;
     // todo add the date and time formatters to a constants in utilities
-    private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("EEE, MMM d, yyyy  hh:mm aaa");
+    private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("EEE, MMM d, yyyy  hh:mm aaa", Locale.US);
 
     private static final String[] PROJECT_COLUMNS = {
         ProjectContract.ProjectEntry.TABLE_NAME + "." + ProjectContract.ProjectEntry._ID,
@@ -76,7 +77,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
         {
             activeStatus = "Project Inactive";
         }
-        holder.mActiveTextView.setText(activeStatus);
+        //holder.mActiveTextView.setText(activeStatus);
     }
 
     @Override
@@ -91,7 +92,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
         public final TextView mFrequencyTextView;
         public final TextView mStartTimeTextView;
         public final TextView mEndTimeTextView;
-        public final TextView mActiveTextView;
+        //public final TextView mActiveTextView;
         public int mProjectId;
         public ProjectAdapterViewHolder(View itemView) {
             super(itemView);
@@ -100,7 +101,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
             mFrequencyTextView = (TextView)itemView.findViewById(R.id.frequency_text_view);
             mStartTimeTextView = (TextView)itemView.findViewById(R.id.start_time_text_view);
             mEndTimeTextView = (TextView)itemView.findViewById(R.id.end_time_text_view);
-            mActiveTextView = (TextView) itemView.findViewById(R.id.active_text_view);
+            //mActiveTextView = (TextView) itemView.findViewById(R.id.);
             itemView.setOnClickListener(this);
         }
 

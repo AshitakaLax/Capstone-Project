@@ -5,7 +5,7 @@ android {
     buildToolsVersion '24.0.1'
     defaultConfig {
         applicationId "com.ashitakalax.scheduledtimelapse"
-        minSdkVersion 18
+        minSdkVersion 21
         targetSdkVersion 24
         versionName '1.0.0'
     }
@@ -18,6 +18,18 @@ android {
     compileOptions {
     }
     productFlavors {
+        free
+                {
+                    applicationId "com.ashitakalax.scheduledtimelapse.free"
+                    versionCode 1
+                    versionName "1.0.0"
+                }
+        premium
+                {
+                    applicationId "com.ashitakalax.scheduledtimelapse.premium"
+                    versionCode 1
+                    versionName "1.0.0"
+                }
     }
 }
 repositories {
@@ -29,15 +41,12 @@ repositories {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.1.0'
-    compile 'com.android.support:design:24.1.0'
-    compile 'com.android.support:cardview-v7:24.1.+'
-    compile 'com.android.support:recyclerview-v7:24.1.+'
+    freeCompile 'com.google.android.gms:play-services-ads:9.4.0'
+    compile 'com.google.firebase:firebase-core:9.4.0'
+    compile 'com.android.support:appcompat-v7:24.1.1'
+    compile 'com.android.support:design:24.1.1'
+    compile 'com.android.support:cardview-v7:24.1.1'
+    compile 'com.android.support:recyclerview-v7:24.1.1'
     compile 'com.wdullaer:materialdatetimepicker:2.4.0'
-    compile 'com.commonsware.cwac:anddown:0.2.+'
-
-    //    androidTestCompile 'com.android.support.test:runner:0.4'
-    //    androidTestCompile 'com.android.support.test:rules:0.4'
-    //    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
-    //    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
+    compile 'com.commonsware.cwac:anddown:0.2.4'
 }

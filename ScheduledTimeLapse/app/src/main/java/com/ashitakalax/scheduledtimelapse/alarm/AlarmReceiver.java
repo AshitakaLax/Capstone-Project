@@ -284,14 +284,8 @@ public class AlarmReceiver extends BroadcastReceiver{
     public void setAlarm(Context context)
     {
         checkAlarms(context);
-        return;
-//        //get the next alarm that we need
-//        AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-//        Intent i = new Intent("alarm.START_ALARM");
-////        Intent i = new Intent(context, AlarmReceiver.class);
-//        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
-//        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60, pi); // Millisec * Second * Minute
     }
+
     private void deactivateAlarm(Context context, int mProjectId)
     {
         ContentValues newProjectValues = new ContentValues();

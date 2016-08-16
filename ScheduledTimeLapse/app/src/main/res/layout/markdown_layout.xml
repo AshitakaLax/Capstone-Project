@@ -7,6 +7,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="MarkDown Text"
         android:id="@+id/user_manual_textview" />
 </LinearLayout>
