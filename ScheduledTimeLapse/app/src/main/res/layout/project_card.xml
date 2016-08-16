@@ -17,6 +17,7 @@
         android:paddingBottom="@dimen/card_padding"
         card_view:cardCornerRadius="4dp"
         card_view:cardBackgroundColor="@color/cardview_light_background"
+        card_view:cardUseCompatPadding="true"
         android:elevation="2dp">
         <!--todo update the elevation above to work with api 18 -->
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

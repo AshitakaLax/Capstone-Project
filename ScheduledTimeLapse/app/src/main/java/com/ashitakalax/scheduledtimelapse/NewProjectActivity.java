@@ -61,7 +61,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     private Button saveProjectButton;
     private Switch mActiveSwitch;
 
-    private int mProjectPosition;
+    private long mProjectPosition;
     private int mProjectId;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy", Locale.US);
@@ -110,10 +110,15 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mProjectPosition = -1;
-        if(savedInstanceState == null)
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null)
         {
-            mProjectPosition= getIntent().getIntExtra(PROJECT_POSITION, -1);
+            mProjectPosition= extras.getLong(PROJECT_POSITION, -1);
+        }
+        else
+        {
+            mProjectPosition= -1;
         }
 
         setContentView(R.layout.new_project_layout);
@@ -251,11 +256,12 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
             Toast.makeText(this, "Invalid Time set, End Time can't be before start Time", Toast.LENGTH_LONG).show();
             return;
         }
-        if(now.getTimeInMillis() > startCalendar.getTimeInMillis())
-        {
-            Toast.makeText(this, "Invalid Time set, Start Time can't be before now", Toast.LENGTH_LONG).show();
-            return;
-        }
+        //this just means that it will start when active
+//        if(now.getTimeInMillis() > startCalendar.getTimeInMillis())
+//        {
+//            Toast.makeText(this, "Invalid Time set, Start Time can't be before now", Toast.LENGTH_LONG).show();
+//            return;
+//        }
         ContentValues newProjectValues = new ContentValues();
 
         newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_TITLE, this.titleEditText.getText().toString());

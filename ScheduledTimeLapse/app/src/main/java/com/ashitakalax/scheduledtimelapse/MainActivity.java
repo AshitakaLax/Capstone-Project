@@ -1,6 +1,7 @@
 package com.ashitakalax.scheduledtimelapse;
 
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,8 +33,9 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 // todo update this activity to be a fragment
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor> {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor>, ProjectCursorAdapter.OnProjectSelected, ProjectCursorAdapter.OnProjectActiveStateChanged {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     private static final int PROJECT_LOADER = 0;
     private static final String[] PROJECT_COLUMNS = {
             ProjectContract.ProjectEntry.TABLE_NAME + "." + ProjectContract.ProjectEntry._ID,
@@ -122,30 +125,10 @@ public class MainActivity extends AppCompatActivity
             //This is the cursor adapter implementation
 
             mCursorAdapter = new ProjectCursorAdapter(this, null, 0);
+            mCursorAdapter.setOnProjectSelectListener(this);
+            mCursorAdapter.setmOnProjectActiveChanged(this);
             //change the recycle view to be just a list view
             this.mListView.setAdapter(mCursorAdapter);
-            this.mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                    if (cursor != null)
-                    {
-
-                        int projectId = cursor.getInt(COL_PROJECT_ID);
-
-                        Intent intent = new Intent(getApplicationContext(), NewProjectActivity.class);
-                        intent.putExtra(NewProjectActivity.PROJECT_POSITION, projectId);
-                        startActivity(intent);
-                        //Long movieId = (long) cursor.getInt(COL_MOVIE_ID);
-//
-//                        try{
-//                            ((OnMovieSelected) mMainActivity).onMovieSelected(movieId);
-//                        }catch (ClassCastException cce){
-//
-//                        }
-                    }
-                }
-            });
 
             LoaderManager manager = this.getSupportLoaderManager();
             manager.initLoader(PROJECT_LOADER, null, this);
@@ -225,10 +208,6 @@ public class MainActivity extends AppCompatActivity
             mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
             Intent intent = new Intent(this, UserManualActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -269,5 +248,49 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void onProjectSelected(long projectId)
+    {
+        Intent intent = new Intent(getApplicationContext(), NewProjectActivity.class);
+        Bundle args = new Bundle();
+        args.putLong(NewProjectActivity.PROJECT_POSITION, projectId);
+        intent.putExtra(NewProjectActivity.PROJECT_POSITION, projectId);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onProjectActiveState(int projectId, boolean isActive) {
+        Cursor cursor =getContentResolver().query(
+                ProjectContract.ProjectEntry.CONTENT_URI
+                ,null
+                ,ProjectContract.ProjectEntry._ID + " = ?"
+                ,new String[] {String.valueOf(projectId)}, null);
+        if(cursor == null)
+        {
+            return;
+        }
+        ContentValues updatedProjectValues = new ContentValues();
+        try {
+            cursor.moveToFirst();
+            boolean projectActive = cursor.getString(COL_PROJECT_ACTIVE).equals("1");
+            cursor.close();
+            if (projectActive != isActive) {
+                updatedProjectValues.put(ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE, isActive);
+                this.getContentResolver().update(ProjectContract.ProjectEntry.CONTENT_URI, updatedProjectValues, ProjectContract.ProjectEntry._ID + "=?", new String[]{String.valueOf(projectId)});
+            }
+
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG, "Cursor error" + e.getMessage());
+        }
+        finally {
+            if(!cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+
+        alarm.checkAlarms(this);
+    }
 }
 
