@@ -38,11 +38,13 @@
     <string name="new_project_frequency">Frequency</string>
     <string name="new_project_sample_date">Tue, Jul 24, 2016</string>
     <string name="new_project_sample_time">12:12 pm</string>
+    <string name="google_app_id">1:365247791071:android:f78b010329056009</string>
 
 
     <!--Content Description Strings-->
     <string name="nav_header_image_cd">App Icon</string>
     <string name="nav_user_email">User_email@email.com</string>
-    <string name="appwidget_text">EXAMPLE</string>
+    <string name="appwidget_example_title_text">Moon: </string>
+    <string name="appwidget_exmaple_time_text">Tue, Jun 12, 12:36 am </string>
     <string name="add_widget">Add widget</string>
 </resources>

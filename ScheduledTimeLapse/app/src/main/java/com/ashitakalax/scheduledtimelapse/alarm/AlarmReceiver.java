@@ -2,6 +2,7 @@ package com.ashitakalax.scheduledtimelapse.alarm;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,6 +22,8 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.ashitakalax.scheduledtimelapse.ActiveTimelapseProjectsWidget;
+import com.ashitakalax.scheduledtimelapse.R;
 import com.ashitakalax.scheduledtimelapse.controller.CameraController;
 import com.ashitakalax.scheduledtimelapse.data.ProjectContract;
 
@@ -264,20 +267,36 @@ public class AlarmReceiver extends BroadcastReceiver{
                 PendingIntent futurePendingIntent = PendingIntent.getBroadcast(context, 0, futureIntent, 0);
                 //time is valid to set
                 am.setRepeating(AlarmManager.RTC_WAKEUP, startCalendarTime.getTimeInMillis(), frequencyIncrement, futurePendingIntent); // Millisec * Second * Minute
+                //update Widget
+
             }
         } finally {
             cursor.close();
         }
+        updateWidget(context);
     }
 
-    public Calendar getNextAlarm(long startTime, float frequency)
+    private void updateWidget(Context context)
+    {
+        Intent intent = new Intent(context, ActiveTimelapseProjectsWidget.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        int[] ids = {R.xml.active_timelapse_projects_widget_info};
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        context.sendBroadcast(intent);
+    }
+    //todo unit test this
+    public static Calendar getNextAlarm(long startTime, float frequency)
     {
         Calendar calendar = Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
         calendar.setTimeInMillis(startTime);
         double period = (1/frequency);
         //the period is how far apart each picture will be taken, should be 5+ seconds
         period *= 1000; // convert the period into milliseconds for precision here
-        calendar.add(Calendar.MILLISECOND, (int)period);
+        while(calendar.getTimeInMillis() < now.getTimeInMillis())
+        {
+            calendar.add(Calendar.MILLISECOND, (int)period);
+        }
         return calendar;//currently this isn't correct. this could be in the past
     }
 
