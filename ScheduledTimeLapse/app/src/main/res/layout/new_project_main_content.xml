@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/new_project_view">
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -63,7 +65,8 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="2">
+        android:weightSum="2"
+        android:id="@+id/end_time_view">
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

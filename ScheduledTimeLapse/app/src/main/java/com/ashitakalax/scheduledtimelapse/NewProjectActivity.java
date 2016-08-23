@@ -5,9 +5,17 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Explode;
+import android.transition.Fade;
+import android.transition.Scene;
+import android.transition.Slide;
+import android.transition.TransitionManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -61,7 +69,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     private Button saveProjectButton;
     private Switch mActiveSwitch;
 
-    private long mProjectPosition;
+    private int mProjectPosition;
     private int mProjectId;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy", Locale.US);
@@ -111,17 +119,29 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         Bundle extras = getIntent().getExtras();
+        setContentView(R.layout.new_project_layout);
+        Explode explode = new Explode();
+        explode.setDuration(2000);
+        getWindow().setReenterTransition(explode);
+        getWindow().setReturnTransition(explode);
+        getWindow().setEnterTransition(explode);
+
+        Slide slide = new Slide(Gravity.RIGHT);//(Slide)TransitionInflater.from(this).inflateTransition(R.transition.project_transitions);
+        ViewGroup rootView = (ViewGroup)findViewById(R.id.new_project_container);
+        slide.setDuration(3000);
+        TransitionManager.beginDelayedTransition(rootView, slide);
+        TransitionManager.go(new Scene(rootView), slide);
         if(extras != null)
         {
-            mProjectPosition= extras.getLong(PROJECT_POSITION, -1);
+            mProjectPosition= extras.getInt(PROJECT_POSITION, -1);
         }
         else
         {
             mProjectPosition= -1;
         }
-
-        setContentView(R.layout.new_project_layout);
 
         //todo add support for saving the options in the toolbar instead of a button
         titleEditText = (EditText)findViewById(R.id.titleEditText);
@@ -217,6 +237,8 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
             }
         });
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

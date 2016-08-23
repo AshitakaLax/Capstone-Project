@@ -1,5 +1,6 @@
 package com.ashitakalax.scheduledtimelapse;
 
+import android.app.ActivityOptions;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -17,10 +18,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Explode;
+import android.transition.Fade;
+import android.transition.Scene;
+import android.transition.Slide;
+import android.transition.TransitionInflater;
+import android.transition.TransitionManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -68,12 +78,29 @@ public class MainActivity extends AppCompatActivity
     AdSupport mAdSupport;
     private FirebaseAnalytics mFirebaseAnalytics;
     private AlarmReceiver alarm = new AlarmReceiver();
+    private AppCompatActivity mMainActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mMainActivity = this;
+        getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
         setContentView(R.layout.activity_main);
+        Slide activitySlide = new Slide(Gravity.BOTTOM);
+        activitySlide.setDuration(2000);
+        getWindow().setExitTransition(activitySlide);
+        getWindow().setReenterTransition(activitySlide);
+        getWindow().setReturnTransition(activitySlide);
+        //setup exit transition
+        Slide slide = new Slide(Gravity.BOTTOM);//(Slide)TransitionInflater.from(this).inflateTransition(R.transition.project_transitions);
+        ViewGroup rootView = (ViewGroup)findViewById(R.id.my_list_view);
+        slide.setDuration(1000);
+        //TransitionManager.beginDelayedTransition(rootView, slide);
+        TransitionManager.go(new Scene(rootView), slide);
+
+        getWindow().setExitTransition(slide);
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -113,7 +140,7 @@ public class MainActivity extends AppCompatActivity
                     //start the newProjectActivity
                     Intent intent = new Intent(getApplicationContext(), NewProjectActivity.class);
                     intent.putExtra(NewProjectActivity.PROJECT_POSITION, vh.mProjectId);
-                    startActivity(intent);
+                    startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(mMainActivity).toBundle());
                 }
             });
             mRecyclerView.setAdapter(mAdapter);
@@ -133,6 +160,7 @@ public class MainActivity extends AppCompatActivity
             LoaderManager manager = this.getSupportLoaderManager();
             manager.initLoader(PROJECT_LOADER, null, this);
         }
+
     }
 
     @Override
@@ -227,7 +255,7 @@ public class MainActivity extends AppCompatActivity
 
         Intent intent = new Intent(this, NewProjectActivity.class);
         intent.putExtra(NewProjectActivity.PROJECT_POSITION, -1);
-        startActivity(intent);
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
     @Override
@@ -253,9 +281,9 @@ public class MainActivity extends AppCompatActivity
     {
         Intent intent = new Intent(getApplicationContext(), NewProjectActivity.class);
         Bundle args = new Bundle();
-        args.putLong(NewProjectActivity.PROJECT_POSITION, projectId);
-        intent.putExtra(NewProjectActivity.PROJECT_POSITION, projectId);
-        startActivity(intent);
+        args.putInt(NewProjectActivity.PROJECT_POSITION, (int)projectId);
+        intent.putExtra(NewProjectActivity.PROJECT_POSITION, (int)projectId);
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
     @Override

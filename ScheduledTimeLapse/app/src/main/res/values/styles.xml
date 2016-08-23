@@ -7,6 +7,9 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/background</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowEnterTransition">@transition/project_transitions</item>
+        <item name="android:windowExitTransition">@transition/fade_new_project</item>
     </style>
 
     <!--<style name="AppTheme" parent="android:Theme.Material">-->
