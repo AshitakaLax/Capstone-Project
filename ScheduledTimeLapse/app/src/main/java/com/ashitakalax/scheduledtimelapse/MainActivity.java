@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.CircularPropagation;
 import android.transition.Explode;
 import android.transition.Fade;
 import android.transition.Scene;
@@ -87,14 +88,14 @@ public class MainActivity extends AppCompatActivity
         getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
         setContentView(R.layout.activity_main);
         Slide activitySlide = new Slide(Gravity.BOTTOM);
-        activitySlide.setDuration(2000);
+        activitySlide.setDuration(300);
         getWindow().setExitTransition(activitySlide);
         getWindow().setReenterTransition(activitySlide);
         getWindow().setReturnTransition(activitySlide);
         //setup exit transition
         Slide slide = new Slide(Gravity.BOTTOM);//(Slide)TransitionInflater.from(this).inflateTransition(R.transition.project_transitions);
         ViewGroup rootView = (ViewGroup)findViewById(R.id.my_list_view);
-        slide.setDuration(1000);
+        slide.setDuration(300);
         //TransitionManager.beginDelayedTransition(rootView, slide);
         TransitionManager.go(new Scene(rootView), slide);
 
@@ -252,7 +253,6 @@ public class MainActivity extends AppCompatActivity
         bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "fab");
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "newProject");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-
         Intent intent = new Intent(this, NewProjectActivity.class);
         intent.putExtra(NewProjectActivity.PROJECT_POSITION, -1);
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());

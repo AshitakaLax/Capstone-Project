@@ -123,17 +123,17 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         Bundle extras = getIntent().getExtras();
         setContentView(R.layout.new_project_layout);
-        Explode explode = new Explode();
-        explode.setDuration(2000);
-        getWindow().setReenterTransition(explode);
-        getWindow().setReturnTransition(explode);
-        getWindow().setEnterTransition(explode);
+        Fade fade = new Fade(Fade.IN);
+        Fade fadeExit = new Fade(Fade.OUT);
+        fade.setDuration(300);
+        fadeExit.setDuration(300);
+        getWindow().setReenterTransition(fade);
+        getWindow().setReturnTransition(fadeExit);
+        getWindow().setEnterTransition(fade);
 
-        Slide slide = new Slide(Gravity.RIGHT);//(Slide)TransitionInflater.from(this).inflateTransition(R.transition.project_transitions);
         ViewGroup rootView = (ViewGroup)findViewById(R.id.new_project_container);
-        slide.setDuration(3000);
-        TransitionManager.beginDelayedTransition(rootView, slide);
-        TransitionManager.go(new Scene(rootView), slide);
+//        TransitionManager.beginDelayedTransition(rootView, fade);
+        TransitionManager.go(new Scene(rootView), fade);
         if(extras != null)
         {
             mProjectPosition= extras.getInt(PROJECT_POSITION, -1);
