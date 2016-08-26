@@ -5,13 +5,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.transition.Explode;
 import android.transition.Fade;
 import android.transition.Scene;
-import android.transition.Slide;
 import android.transition.TransitionManager;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +19,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ashitakalax.scheduledtimelapse.adapter.ProjectAdapter;
 import com.ashitakalax.scheduledtimelapse.data.ProjectContract;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
@@ -132,7 +128,6 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         getWindow().setEnterTransition(fade);
 
         ViewGroup rootView = (ViewGroup)findViewById(R.id.new_project_container);
-//        TransitionManager.beginDelayedTransition(rootView, fade);
         TransitionManager.go(new Scene(rootView), fade);
         if(extras != null)
         {
@@ -146,7 +141,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         //todo add support for saving the options in the toolbar instead of a button
         titleEditText = (EditText)findViewById(R.id.titleEditText);
         frequencyEditText = (EditText)findViewById(R.id.frequencyEditText);
-        saveProjectButton = (Button)findViewById(R.id.addProjecButton);
+        saveProjectButton = (Button)findViewById(R.id.addProjectButton);
 
         startDateTextView = (TextView)findViewById(R.id.startDateEditText);
         startTimeTextView = (TextView)findViewById(R.id.startTimeEditText);
@@ -163,14 +158,8 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
                     ,ProjectContract.ProjectEntry._ID + " = ?"
                     ,new String[] {String.valueOf(mProjectPosition)}, null);
 
-//            Cursor cursor = getContentResolver().query(ProjectContract.ProjectEntry.CONTENT_URI
-//                    ,null
-//                    ,null
-//                    ,null
-//                    ,null);
             try {
                 cursor.moveToFirst();
-//                cursor.moveToPosition(mProjectPosition);
 
                 String titleStr = cursor.getString(COL_PROJECT_TITLE);
                 Float frequency = cursor.getFloat(COL_PROJECT_FREQUENCY);
@@ -190,7 +179,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
                 endCalendar.setTimeInMillis(endRaw);
                 endDateTextView.setText(dateFormat.format(temp.getTime()));
                 endTimeTextView.setText(timeFormat.format(temp.getTime()));
-                saveProjectButton.setText("Update Project");
+                saveProjectButton.setText(R.string.project_update_button_text);
                 mActiveSwitch.setChecked(projectActive);
                 cursor.close();
             }
@@ -275,15 +264,10 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
 
         if(this.startCalendar.getTimeInMillis() > this.endCalendar.getTimeInMillis())
         {
-            Toast.makeText(this, "Invalid Time set, End Time can't be before start Time", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.invalid_time_prompt, Toast.LENGTH_LONG).show();
             return;
         }
         //this just means that it will start when active
-//        if(now.getTimeInMillis() > startCalendar.getTimeInMillis())
-//        {
-//            Toast.makeText(this, "Invalid Time set, Start Time can't be before now", Toast.LENGTH_LONG).show();
-//            return;
-//        }
         ContentValues newProjectValues = new ContentValues();
 
         newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_TITLE, this.titleEditText.getText().toString());

@@ -46,4 +46,13 @@
     <string name="appwidget_example_title_text">Moon: </string>
     <string name="appwidget_exmaple_time_text">Tue, Jun 12, 12:36 am </string>
     <string name="add_widget">Add widget</string>
+    <string name="project_card_expired">Expired</string>
+    <string name="project_card_active">Active</string>
+    <string name="project_card_inactive">Inactive</string>
+    <string name="widget_no_active_projects">No active Projects</string>
+    <string name="project_update_button_text">Update Project</string>
+    <string name="invalid_time_prompt">Invalid Time set, End Time can\'t be before start Time</string>
+    <string name="add_project_button_text">Add Project</string>
+    <string name="activate_project_new_project">Activate Project</string>
+    <string name="picture_size_settings">Picture Size</string>
 </resources>

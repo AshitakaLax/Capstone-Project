@@ -90,10 +90,10 @@
     <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Activate Project"
+        android:text="@string/activate_project_new_project"
         android:id="@+id/projectActiveSwitch"
-        android:layout_gravity="right"
-        android:layout_marginRight="10dp"
+        android:layout_gravity="end"
+        android:layout_marginEnd="10dp"
         android:showText="false"
         android:singleLine="false"
         android:splitTrack="false"
@@ -102,9 +102,9 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Project"
-        android:id="@+id/addProjecButton"
-        android:layout_gravity="right"
-        android:layout_marginRight="10dp" />
+        android:text="@string/add_project_button_text"
+        android:id="@+id/addProjectButton"
+        android:layout_gravity="end"
+        android:layout_marginEnd="10dp" />
 
 </LinearLayout>

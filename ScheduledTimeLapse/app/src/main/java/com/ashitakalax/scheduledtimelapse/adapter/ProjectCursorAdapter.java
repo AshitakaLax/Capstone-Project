@@ -37,7 +37,6 @@ public class ProjectCursorAdapter extends CursorAdapter {
 
     private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("EEE, MMM d, yyyy  hh:mm aaa", Locale.US);
 
-    private AlarmReceiver alarm = new AlarmReceiver();
     private OnProjectSelected mOnProjectSelected;
     private OnProjectActiveStateChanged mOnProjectActiveChanged;
     private ArrayList<Switch> mSwitchList;
@@ -47,7 +46,6 @@ public class ProjectCursorAdapter extends CursorAdapter {
     public interface OnProjectActiveStateChanged {
         void onProjectActiveState(int projectId, boolean isActive);
     }
-
 
     public ProjectCursorAdapter(Context context, Cursor c, int flags)
     {
@@ -63,8 +61,6 @@ public class ProjectCursorAdapter extends CursorAdapter {
     {
         this.mOnProjectActiveChanged = listener;
     }
-
-
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
@@ -104,22 +100,8 @@ public class ProjectCursorAdapter extends CursorAdapter {
         TextView frequencyTextView = (TextView)view.findViewById(R.id.frequency_text_view);
         TextView startTimeTextView = (TextView)view.findViewById(R.id.start_time_text_view);
         TextView endTimeTextView = (TextView)view.findViewById(R.id.end_time_text_view);
-//        TextView activeTextView = (TextView) view.findViewById(R.id.active_text_view);
         Switch activeSwitch = (Switch) view.findViewById(R.id.projectActiveSwitch);
-//        activeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-//
-//                View parent =  (View)compoundButton.getParent();
-//                mOnProjectActiveChanged.onProjectActiveState(parent.getId(), b);
-//                if(b) {
-//                    compoundButton.setText(R.string.card_subtitle_active);
-//                }
-//                else {
-//                    compoundButton.setText(R.string.card_subtitle_inactive);
-//                }
-//            }
-//        });
+
         // todo add image to cardview(either default or one that is part of the set)
         titleTextView.setText(cursor.getString(COL_PROJECT_TITLE));
         String freqStr = "Frequency " + cursor.getFloat(COL_PROJECT_FREQUENCY);
@@ -137,23 +119,21 @@ public class ProjectCursorAdapter extends CursorAdapter {
             cardView.setElevation(R.dimen.cardview_default_elevation);
             activeSwitch.setChecked(false);
             activeSwitch.setEnabled(false);
-            activeStatus = "Expired";
+            activeStatus = context.getString(R.string.project_card_expired);
         }
         else if(cursor.getString(COL_PROJECT_ACTIVE).equals("1"))
         {
             activeSwitch.setChecked(true);
             cardView.setElevation(R.dimen.card_raised_elevation);
 
-            activeStatus = "Active";
+            activeStatus = context.getString(R.string.project_card_active);
         }
         else
         {
             cardView.setElevation(R.dimen.cardview_default_elevation);
             activeSwitch.setChecked(false);
-            activeStatus = "Inactive";
+            activeStatus = context.getString(R.string.project_card_inactive);
         }
         activeSwitch.setText(activeStatus);
-//        activeTextView.setText(activeStatus);
-
     }
 }

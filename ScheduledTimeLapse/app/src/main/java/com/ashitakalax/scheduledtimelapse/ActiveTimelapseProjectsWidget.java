@@ -54,7 +54,7 @@ public class ActiveTimelapseProjectsWidget extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.active_timelapse_projects_widget);
         if(!isActive)
         {
-            title = "No active Projects";
+            title = context.getString(R.string.widget_no_active_projects);
             views.setTextViewText(R.id.appwidget_time_text, "");
             views.setContentDescription(R.id.appwidget_time_text, "");
         }

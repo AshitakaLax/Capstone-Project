@@ -42,14 +42,7 @@ import java.util.concurrent.SynchronousQueue;
 public class AlarmReceiver extends BroadcastReceiver{
 
     static final String TAG = "ALARM_RECEIVER";
-    private static final String[] PROJECT_COLUMNS = {
-            ProjectContract.ProjectEntry.TABLE_NAME + "." + ProjectContract.ProjectEntry._ID,
-            ProjectContract.ProjectEntry.COLUMN_TITLE,
-            ProjectContract.ProjectEntry.COLUMN_FREQUENCY,
-            ProjectContract.ProjectEntry.COLUMN_START_TIME,
-            ProjectContract.ProjectEntry.COLUMN_END_TIME,
-            ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE
-    };
+
 
     // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
     // must change.
@@ -61,18 +54,18 @@ public class AlarmReceiver extends BroadcastReceiver{
     static final int COL_PROJECT_ACTIVE = 5;
 
     static final String BUNDLE_PROJECT_TITLE = "project_title";
-    static final String BUNDLE_PROJECT_ID = "project_id";
+    //static final String BUNDLE_PROJECT_ID = "project_id";
 
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle bundle = intent.getExtras();
         final String ProjectTitle;
-        final int projectId;
+        //final int projectId;
         if(bundle != null)
         {
             ProjectTitle = bundle.getString(BUNDLE_PROJECT_TITLE, "No Extras");
-            projectId = bundle.getInt(BUNDLE_PROJECT_ID, -1);
+            //projectId = bundle.getInt(BUNDLE_PROJECT_ID, -1);
         }
         else
         {
@@ -85,7 +78,7 @@ public class AlarmReceiver extends BroadcastReceiver{
 
 
         // Put here YOUR code.
-        Toast.makeText(context, ProjectTitle +" Taking a Picture !!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
+        Toast.makeText(context, "Taking a Picture", Toast.LENGTH_LONG).show(); // For example
         final SurfaceView preview = new SurfaceView(context);
         SurfaceHolder holder = preview.getHolder();
 
@@ -167,12 +160,6 @@ public class AlarmReceiver extends BroadcastReceiver{
         });
 
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-//        WindowManager.LayoutParams params = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
-//                WindowManager.LayoutParams.WRAP_CONTENT,
-//                WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
-//                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-//                PixelFormat.TRANSLUCENT);
-
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 1, 1,
                 WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
