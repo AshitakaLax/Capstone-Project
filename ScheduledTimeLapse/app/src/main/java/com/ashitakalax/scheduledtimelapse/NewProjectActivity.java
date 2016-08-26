@@ -23,6 +23,7 @@ import com.ashitakalax.scheduledtimelapse.data.ProjectContract;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
+import com.wdullaer.materialdatetimepicker.time.Timepoint;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -44,6 +45,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
             ProjectContract.ProjectEntry.COLUMN_END_TIME,
             ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE
     };
+    private static final char[] ILLEGAL_CHARACTERS = { '/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':' };
 
     // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
     // must change.
@@ -240,6 +242,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         DatePickerDialog datePickerDialog;
         Calendar now = Calendar.getInstance();
         datePickerDialog = DatePickerDialog.newInstance(dateSetListener,now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+        datePickerDialog.setMinDate(now);
         datePickerDialog.show(getFragmentManager(), "DatePickerDialog");
     }
 
@@ -265,6 +268,40 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         if(this.startCalendar.getTimeInMillis() > this.endCalendar.getTimeInMillis())
         {
             Toast.makeText(this, R.string.invalid_time_prompt, Toast.LENGTH_LONG).show();
+            return;
+        }
+        //check that title isn't empty
+        String title = this.titleEditText.getText().toString();
+        for(char c :ILLEGAL_CHARACTERS)
+        {
+            if(title.contains(c + ""))
+            {
+                this.titleEditText.setError(getString(R.string.new_project_invalid_char) + c);
+                return;
+            }
+        }
+        if(title.isEmpty())
+        {
+            this.titleEditText.setError(getString(R.string.project_error_must_have_title));
+            return;
+        }
+        //check that the frequency isn't to fast or negative
+        String frequencyStr = this.frequencyEditText.getText().toString();
+        float frequency;
+        try
+        {
+            frequency = Float.parseFloat(frequencyStr);
+
+        }
+        catch (Exception ex)
+        {
+            this.frequencyEditText.setError(getString(R.string.new_project_invalid_frequency));
+            return;
+        }
+
+        if(frequency <= 0 || frequency > 0.1)
+        {
+            this.frequencyEditText.setError(getString(R.string.new_project_invalid_freq_range));
             return;
         }
         //this just means that it will start when active

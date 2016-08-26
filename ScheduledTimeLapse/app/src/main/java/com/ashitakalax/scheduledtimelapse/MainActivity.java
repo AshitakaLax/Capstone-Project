@@ -174,13 +174,15 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, CameraPreviewActivity.class);
             startActivity(intent);
             return true;
-        } else if (id == R.id.nav_gallery) {
-
-            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "gallery");
-            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-            ((TextView) this.findViewById(R.id.textView)).setText("TODO open gallery");
-
-        } else if (id == R.id.nav_user_manual) {
+        }
+//        else if (id == R.id.nav_gallery) {
+//
+//            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "gallery");
+//            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+//            ((TextView) this.findViewById(R.id.textView)).setText("TODO open gallery");
+//
+//        }
+        else if (id == R.id.nav_user_manual) {
 
             // start the User Manual activity
             bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "userManual");

@@ -15,7 +15,8 @@
             android:layout_weight="1"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
-            android:hint="@string/new_project_title"/>
+            android:hint="@string/new_project_title"
+            android:maxLength="50"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -30,7 +31,8 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
             android:hint="@string/new_project_frequency"
-            android:inputType="numberDecimal" />
+            android:inputType="numberDecimal"
+            android:maxLength="10" />
 
     </android.support.design.widget.TextInputLayout>
 

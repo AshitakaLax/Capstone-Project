@@ -57,4 +57,8 @@
     <string name="picture_size_settings">Picture Size</string>
     <string name="create_new_project_fab">Create New Project</string>
     <string name="camera_preview_text">Camera Preview</string>
+    <string name="project_error_must_have_title">Must have a Title</string>
+    <string name="new_project_invalid_char">"Invalid Character "</string>
+    <string name="new_project_invalid_frequency">Invalid frequency</string>
+    <string name="new_project_invalid_freq_range">Sorry frequency must be less than 0.1 and greater than 0</string>
 </resources>
