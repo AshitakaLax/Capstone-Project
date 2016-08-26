@@ -55,4 +55,6 @@
     <string name="add_project_button_text">Add Project</string>
     <string name="activate_project_new_project">Activate Project</string>
     <string name="picture_size_settings">Picture Size</string>
+    <string name="create_new_project_fab">Create New Project</string>
+    <string name="camera_preview_text">Camera Preview</string>
 </resources>
