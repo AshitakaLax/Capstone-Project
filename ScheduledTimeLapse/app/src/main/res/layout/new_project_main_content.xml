@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/new_project_view">
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -13,7 +15,8 @@
             android:layout_weight="1"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
-            android:hint="@string/new_project_title"/>
+            android:hint="@string/new_project_title"
+            android:maxLength="50"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -28,7 +31,8 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
             android:hint="@string/new_project_frequency"
-            android:inputType="numberDecimal" />
+            android:inputType="numberDecimal"
+            android:maxLength="10" />
 
     </android.support.design.widget.TextInputLayout>
 
@@ -63,7 +67,8 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="2">
+        android:weightSum="2"
+        android:id="@+id/end_time_view">
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -87,10 +92,10 @@
     <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Activate Project"
+        android:text="@string/activate_project_new_project"
         android:id="@+id/projectActiveSwitch"
-        android:layout_gravity="right"
-        android:layout_marginRight="10dp"
+        android:layout_gravity="end"
+        android:layout_marginEnd="10dp"
         android:showText="false"
         android:singleLine="false"
         android:splitTrack="false"
@@ -99,9 +104,9 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Project"
-        android:id="@+id/addProjecButton"
-        android:layout_gravity="right"
-        android:layout_marginRight="10dp" />
+        android:text="@string/add_project_button_text"
+        android:id="@+id/addProjectButton"
+        android:layout_gravity="end"
+        android:layout_marginEnd="10dp" />
 
 </LinearLayout>

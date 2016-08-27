@@ -5,20 +5,25 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Fade;
+import android.transition.Scene;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ashitakalax.scheduledtimelapse.adapter.ProjectAdapter;
 import com.ashitakalax.scheduledtimelapse.data.ProjectContract;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
+import com.wdullaer.materialdatetimepicker.time.Timepoint;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -40,6 +45,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
             ProjectContract.ProjectEntry.COLUMN_END_TIME,
             ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE
     };
+    private static final char[] ILLEGAL_CHARACTERS = { '/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':' };
 
     // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
     // must change.
@@ -61,7 +67,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     private Button saveProjectButton;
     private Switch mActiveSwitch;
 
-    private long mProjectPosition;
+    private int mProjectPosition;
     private int mProjectId;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy", Locale.US);
@@ -111,22 +117,33 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         Bundle extras = getIntent().getExtras();
+        setContentView(R.layout.new_project_layout);
+        Fade fade = new Fade(Fade.IN);
+        Fade fadeExit = new Fade(Fade.OUT);
+        fade.setDuration(300);
+        fadeExit.setDuration(300);
+        getWindow().setReenterTransition(fade);
+        getWindow().setReturnTransition(fadeExit);
+        getWindow().setEnterTransition(fade);
+
+        ViewGroup rootView = (ViewGroup)findViewById(R.id.new_project_container);
+        TransitionManager.go(new Scene(rootView), fade);
         if(extras != null)
         {
-            mProjectPosition= extras.getLong(PROJECT_POSITION, -1);
+            mProjectPosition= extras.getInt(PROJECT_POSITION, -1);
         }
         else
         {
             mProjectPosition= -1;
         }
 
-        setContentView(R.layout.new_project_layout);
-
         //todo add support for saving the options in the toolbar instead of a button
         titleEditText = (EditText)findViewById(R.id.titleEditText);
         frequencyEditText = (EditText)findViewById(R.id.frequencyEditText);
-        saveProjectButton = (Button)findViewById(R.id.addProjecButton);
+        saveProjectButton = (Button)findViewById(R.id.addProjectButton);
 
         startDateTextView = (TextView)findViewById(R.id.startDateEditText);
         startTimeTextView = (TextView)findViewById(R.id.startTimeEditText);
@@ -143,14 +160,8 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
                     ,ProjectContract.ProjectEntry._ID + " = ?"
                     ,new String[] {String.valueOf(mProjectPosition)}, null);
 
-//            Cursor cursor = getContentResolver().query(ProjectContract.ProjectEntry.CONTENT_URI
-//                    ,null
-//                    ,null
-//                    ,null
-//                    ,null);
             try {
                 cursor.moveToFirst();
-//                cursor.moveToPosition(mProjectPosition);
 
                 String titleStr = cursor.getString(COL_PROJECT_TITLE);
                 Float frequency = cursor.getFloat(COL_PROJECT_FREQUENCY);
@@ -170,7 +181,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
                 endCalendar.setTimeInMillis(endRaw);
                 endDateTextView.setText(dateFormat.format(temp.getTime()));
                 endTimeTextView.setText(timeFormat.format(temp.getTime()));
-                saveProjectButton.setText("Update Project");
+                saveProjectButton.setText(R.string.project_update_button_text);
                 mActiveSwitch.setChecked(projectActive);
                 cursor.close();
             }
@@ -218,6 +229,8 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         });
     }
 
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
@@ -229,6 +242,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         DatePickerDialog datePickerDialog;
         Calendar now = Calendar.getInstance();
         datePickerDialog = DatePickerDialog.newInstance(dateSetListener,now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+        datePickerDialog.setMinDate(now);
         datePickerDialog.show(getFragmentManager(), "DatePickerDialog");
     }
 
@@ -253,15 +267,44 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
 
         if(this.startCalendar.getTimeInMillis() > this.endCalendar.getTimeInMillis())
         {
-            Toast.makeText(this, "Invalid Time set, End Time can't be before start Time", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.invalid_time_prompt, Toast.LENGTH_LONG).show();
+            return;
+        }
+        //check that title isn't empty
+        String title = this.titleEditText.getText().toString();
+        for(char c :ILLEGAL_CHARACTERS)
+        {
+            if(title.contains(c + ""))
+            {
+                this.titleEditText.setError(getString(R.string.new_project_invalid_char) + c);
+                return;
+            }
+        }
+        if(title.isEmpty())
+        {
+            this.titleEditText.setError(getString(R.string.project_error_must_have_title));
+            return;
+        }
+        //check that the frequency isn't to fast or negative
+        String frequencyStr = this.frequencyEditText.getText().toString();
+        float frequency;
+        try
+        {
+            frequency = Float.parseFloat(frequencyStr);
+
+        }
+        catch (Exception ex)
+        {
+            this.frequencyEditText.setError(getString(R.string.new_project_invalid_frequency));
+            return;
+        }
+
+        if(frequency <= 0 || frequency > 0.1)
+        {
+            this.frequencyEditText.setError(getString(R.string.new_project_invalid_freq_range));
             return;
         }
         //this just means that it will start when active
-//        if(now.getTimeInMillis() > startCalendar.getTimeInMillis())
-//        {
-//            Toast.makeText(this, "Invalid Time set, Start Time can't be before now", Toast.LENGTH_LONG).show();
-//            return;
-//        }
         ContentValues newProjectValues = new ContentValues();
 
         newProjectValues.put(ProjectContract.ProjectEntry.COLUMN_TITLE, this.titleEditText.getText().toString());

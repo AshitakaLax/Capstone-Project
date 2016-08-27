@@ -1,6 +1,6 @@
 package com.ashitakalax.scheduledtimelapse;
 
-import android.app.PendingIntent;
+import android.app.ActivityOptions;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -14,18 +14,20 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Scene;
+import android.transition.Slide;
+import android.transition.TransitionManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.ashitakalax.scheduledtimelapse.adapter.ProjectAdapter;
 import com.ashitakalax.scheduledtimelapse.adapter.ProjectCursorAdapter;
 import com.ashitakalax.scheduledtimelapse.alarm.AlarmReceiver;
 import com.ashitakalax.scheduledtimelapse.data.ProjectContract;
@@ -37,14 +39,6 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int PROJECT_LOADER = 0;
-    private static final String[] PROJECT_COLUMNS = {
-            ProjectContract.ProjectEntry.TABLE_NAME + "." + ProjectContract.ProjectEntry._ID,
-            ProjectContract.ProjectEntry.COLUMN_TITLE,
-            ProjectContract.ProjectEntry.COLUMN_FREQUENCY,
-            ProjectContract.ProjectEntry.COLUMN_START_TIME,
-            ProjectContract.ProjectEntry.COLUMN_END_TIME,
-            ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE
-    };
 
     // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
     // must change.
@@ -55,16 +49,9 @@ public class MainActivity extends AppCompatActivity
     static final int COL_PROJECT_END_TIME = 4;
     static final int COL_PROJECT_ACTIVE = 5;
 
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-
     private ProjectCursorAdapter mCursorAdapter;
-    private ListView mListView;
 
     // Whether or not we are in dual-pane mode
-    boolean mIsDualPane = false;
-    private PendingIntent pendingIntent;
     AdSupport mAdSupport;
     private FirebaseAnalytics mFirebaseAnalytics;
     private AlarmReceiver alarm = new AlarmReceiver();
@@ -72,8 +59,22 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
         setContentView(R.layout.activity_main);
+        Slide activitySlide = new Slide(Gravity.BOTTOM);
+        activitySlide.setDuration(300);
+        getWindow().setExitTransition(activitySlide);
+        getWindow().setReenterTransition(activitySlide);
+        getWindow().setReturnTransition(activitySlide);
+        //setup exit transition
+        Slide slide = new Slide(Gravity.BOTTOM);
+        ListView mListView = (ListView) findViewById(R.id.my_list_view);
+        ViewGroup rootView = mListView;
+        slide.setDuration(300);
+        TransitionManager.go(new Scene(rootView), slide);
+
+        getWindow().setExitTransition(slide);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -99,40 +100,19 @@ public class MainActivity extends AppCompatActivity
 
         this.mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        // setup the recycler view
-        if(false) {
-            mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-            mRecyclerView.setHasFixedSize(true);
+        //listView approach
+        mListView = (ListView)findViewById(R.id.my_list_view);
 
-            // use a linear layout Manager
-            mLayoutManager = new LinearLayoutManager(this);
-            mRecyclerView.setLayoutManager(mLayoutManager);
-            mAdapter = new ProjectAdapter(this, new ProjectAdapter.ProjectAdapterOnClickHandler() {
-                @Override
-                public void onClick(ProjectAdapter.ProjectAdapterViewHolder vh) {
-                    //start the newProjectActivity
-                    Intent intent = new Intent(getApplicationContext(), NewProjectActivity.class);
-                    intent.putExtra(NewProjectActivity.PROJECT_POSITION, vh.mProjectId);
-                    startActivity(intent);
-                }
-            });
-            mRecyclerView.setAdapter(mAdapter);
-        }
-        else
-        {
-            //listView approach
-            mListView = (ListView)findViewById(R.id.my_list_view);
-            //This is the cursor adapter implementation
+        //This is the cursor adapter implementation
+        mCursorAdapter = new ProjectCursorAdapter(this, null, 0);
+        mCursorAdapter.setOnProjectSelectListener(this);
+        mCursorAdapter.setmOnProjectActiveChanged(this);
+        //change the recycle view to be just a list view
+        mListView.setAdapter(mCursorAdapter);
 
-            mCursorAdapter = new ProjectCursorAdapter(this, null, 0);
-            mCursorAdapter.setOnProjectSelectListener(this);
-            mCursorAdapter.setmOnProjectActiveChanged(this);
-            //change the recycle view to be just a list view
-            this.mListView.setAdapter(mCursorAdapter);
+        LoaderManager manager = this.getSupportLoaderManager();
+        manager.initLoader(PROJECT_LOADER, null, this);
 
-            LoaderManager manager = this.getSupportLoaderManager();
-            manager.initLoader(PROJECT_LOADER, null, this);
-        }
     }
 
     @Override
@@ -178,7 +158,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -195,13 +174,15 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, CameraPreviewActivity.class);
             startActivity(intent);
             return true;
-        } else if (id == R.id.nav_gallery) {
-
-            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "gallery");
-            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-            ((TextView) this.findViewById(R.id.textView)).setText("TODO open gallery");
-
-        } else if (id == R.id.nav_user_manual) {
+        }
+//        else if (id == R.id.nav_gallery) {
+//
+//            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "gallery");
+//            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+//            ((TextView) this.findViewById(R.id.textView)).setText("TODO open gallery");
+//
+//        }
+        else if (id == R.id.nav_user_manual) {
 
             // start the User Manual activity
             bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "userManual");
@@ -224,10 +205,9 @@ public class MainActivity extends AppCompatActivity
         bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "fab");
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "newProject");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-
         Intent intent = new Intent(this, NewProjectActivity.class);
         intent.putExtra(NewProjectActivity.PROJECT_POSITION, -1);
-        startActivity(intent);
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
     @Override
@@ -253,9 +233,9 @@ public class MainActivity extends AppCompatActivity
     {
         Intent intent = new Intent(getApplicationContext(), NewProjectActivity.class);
         Bundle args = new Bundle();
-        args.putLong(NewProjectActivity.PROJECT_POSITION, projectId);
-        intent.putExtra(NewProjectActivity.PROJECT_POSITION, projectId);
-        startActivity(intent);
+        args.putInt(NewProjectActivity.PROJECT_POSITION, (int)projectId);
+        intent.putExtra(NewProjectActivity.PROJECT_POSITION, (int)projectId);
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
     @Override

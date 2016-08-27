@@ -2,6 +2,7 @@ package com.ashitakalax.scheduledtimelapse.alarm;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,6 +22,8 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.ashitakalax.scheduledtimelapse.ActiveTimelapseProjectsWidget;
+import com.ashitakalax.scheduledtimelapse.R;
 import com.ashitakalax.scheduledtimelapse.controller.CameraController;
 import com.ashitakalax.scheduledtimelapse.data.ProjectContract;
 
@@ -39,14 +42,7 @@ import java.util.concurrent.SynchronousQueue;
 public class AlarmReceiver extends BroadcastReceiver{
 
     static final String TAG = "ALARM_RECEIVER";
-    private static final String[] PROJECT_COLUMNS = {
-            ProjectContract.ProjectEntry.TABLE_NAME + "." + ProjectContract.ProjectEntry._ID,
-            ProjectContract.ProjectEntry.COLUMN_TITLE,
-            ProjectContract.ProjectEntry.COLUMN_FREQUENCY,
-            ProjectContract.ProjectEntry.COLUMN_START_TIME,
-            ProjectContract.ProjectEntry.COLUMN_END_TIME,
-            ProjectContract.ProjectEntry.COLUMN_ALARM_ACTIVE
-    };
+
 
     // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
     // must change.
@@ -58,18 +54,18 @@ public class AlarmReceiver extends BroadcastReceiver{
     static final int COL_PROJECT_ACTIVE = 5;
 
     static final String BUNDLE_PROJECT_TITLE = "project_title";
-    static final String BUNDLE_PROJECT_ID = "project_id";
+    //static final String BUNDLE_PROJECT_ID = "project_id";
 
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle bundle = intent.getExtras();
         final String ProjectTitle;
-        final int projectId;
+        //final int projectId;
         if(bundle != null)
         {
             ProjectTitle = bundle.getString(BUNDLE_PROJECT_TITLE, "No Extras");
-            projectId = bundle.getInt(BUNDLE_PROJECT_ID, -1);
+            //projectId = bundle.getInt(BUNDLE_PROJECT_ID, -1);
         }
         else
         {
@@ -82,7 +78,7 @@ public class AlarmReceiver extends BroadcastReceiver{
 
 
         // Put here YOUR code.
-        Toast.makeText(context, ProjectTitle +" Taking a Picture !!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
+        Toast.makeText(context, "Taking a Picture", Toast.LENGTH_LONG).show(); // For example
         final SurfaceView preview = new SurfaceView(context);
         SurfaceHolder holder = preview.getHolder();
 
@@ -164,12 +160,6 @@ public class AlarmReceiver extends BroadcastReceiver{
         });
 
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-//        WindowManager.LayoutParams params = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
-//                WindowManager.LayoutParams.WRAP_CONTENT,
-//                WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
-//                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-//                PixelFormat.TRANSLUCENT);
-
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 1, 1,
                 WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
@@ -264,20 +254,36 @@ public class AlarmReceiver extends BroadcastReceiver{
                 PendingIntent futurePendingIntent = PendingIntent.getBroadcast(context, 0, futureIntent, 0);
                 //time is valid to set
                 am.setRepeating(AlarmManager.RTC_WAKEUP, startCalendarTime.getTimeInMillis(), frequencyIncrement, futurePendingIntent); // Millisec * Second * Minute
+                //update Widget
+
             }
         } finally {
             cursor.close();
         }
+        updateWidget(context);
     }
 
-    public Calendar getNextAlarm(long startTime, float frequency)
+    private void updateWidget(Context context)
+    {
+        Intent intent = new Intent(context, ActiveTimelapseProjectsWidget.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        int[] ids = {R.xml.active_timelapse_projects_widget_info};
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        context.sendBroadcast(intent);
+    }
+    //todo unit test this
+    public static Calendar getNextAlarm(long startTime, float frequency)
     {
         Calendar calendar = Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
         calendar.setTimeInMillis(startTime);
         double period = (1/frequency);
         //the period is how far apart each picture will be taken, should be 5+ seconds
         period *= 1000; // convert the period into milliseconds for precision here
-        calendar.add(Calendar.MILLISECOND, (int)period);
+        while(calendar.getTimeInMillis() < now.getTimeInMillis())
+        {
+            calendar.add(Calendar.MILLISECOND, (int)period);
+        }
         return calendar;//currently this isn't correct. this could be in the past
     }
 

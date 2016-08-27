@@ -20,7 +20,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dip"
-        android:text="Picture Size"
+        android:text="@string/picture_size_settings"
         android:layout_marginBottom="5dp"/>
 
     <Spinner
@@ -51,7 +51,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/focus_spinner" />
-
 
     <TextView
         android:layout_width="fill_parent"

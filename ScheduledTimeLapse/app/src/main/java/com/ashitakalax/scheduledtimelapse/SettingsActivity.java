@@ -67,8 +67,10 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
         String item = adapterView.getItemAtPosition(position).toString();
         String optionType = spinnerArray.get(view.getId());
-        optionType = optionType.substring(0, optionType.lastIndexOf('-'));//removes -values
-        CameraController.setCameraOption(this, optionType, item);
+        if(optionType != null) {
+            optionType = optionType.substring(0, optionType.lastIndexOf('-'));//removes -values
+            CameraController.setCameraOption(this, optionType, item);
+        }
     }
 
     @Override

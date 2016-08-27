@@ -43,4 +43,24 @@
     <!--Content Description Strings-->
     <string name="nav_header_image_cd">App Icon</string>
     <string name="nav_user_email">User_email@email.com</string>
+    <string name="appwidget_example_title_text">Moon: </string>
+    <string name="appwidget_exmaple_time_text">Tue, Jun 12, 12:36 am </string>
+    <string name="add_widget">Add widget</string>
+    <string name="project_card_expired">Expired</string>
+    <string name="project_card_active">Active</string>
+    <string name="project_card_inactive">Inactive</string>
+    <string name="widget_no_active_projects">No active Projects</string>
+    <string name="project_update_button_text">Update Project</string>
+    <string name="invalid_time_prompt">Invalid Time set, End Time can\'t be before start Time</string>
+    <string name="add_project_button_text">Add Project</string>
+    <string name="activate_project_new_project">Activate Project</string>
+    <string name="picture_size_settings">Picture Size</string>
+    <string name="create_new_project_fab">Create New Project</string>
+    <string name="camera_preview_text">Camera Preview</string>
+    <string name="project_error_must_have_title">Must have a Title</string>
+    <string name="new_project_invalid_char">"Invalid Character "</string>
+    <string name="new_project_invalid_frequency">Invalid frequency</string>
+    <string name="new_project_invalid_freq_range">Sorry frequency must be less than 0.1 and greater than 0</string>
+    <string name="scheduled_timelaspe_title">Scheduled Timelaspe</string>
+    <string name="high_res_timelapse">High Res Timelapse</string>
 </resources>

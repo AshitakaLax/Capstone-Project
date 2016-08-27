@@ -62,22 +62,13 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectA
     @Override
     public void onBindViewHolder(ProjectAdapterViewHolder holder, int position) {
         mCursor.moveToPosition(position);
-        // todo add image to cardview(either default or one that is part of the set)
+        String frequency = "Frequency " + mCursor.getFloat(COL_PROJECT_FREQUENCY);
+        // todo add image to card view(either default or one that is part of the set)
         holder.mProjectId = mCursor.getInt(COL_PROJECT_ID);
         holder.mTitleTextView.setText(mCursor.getString(COL_PROJECT_TITLE));
-        holder.mFrequencyTextView.setText( "Frequency " + mCursor.getFloat(COL_PROJECT_FREQUENCY));
+        holder.mFrequencyTextView.setText(frequency);
         holder.mStartTimeTextView.setText(dateTimeFormat.format(new Date(mCursor.getLong(COL_PROJECT_START_TIME))));
         holder.mEndTimeTextView.setText(dateTimeFormat.format(new Date(mCursor.getLong(COL_PROJECT_END_TIME))));
-        String activeStatus;
-        if(mCursor.getString(COL_PROJECT_ACTIVE).equals("1"))
-        {
-            activeStatus = "Project Active";
-        }
-        else
-        {
-            activeStatus = "Project Inactive";
-        }
-        //holder.mActiveTextView.setText(activeStatus);
     }
 
     @Override
