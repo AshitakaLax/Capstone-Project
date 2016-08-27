@@ -61,4 +61,6 @@
     <string name="new_project_invalid_char">"Invalid Character "</string>
     <string name="new_project_invalid_frequency">Invalid frequency</string>
     <string name="new_project_invalid_freq_range">Sorry frequency must be less than 0.1 and greater than 0</string>
+    <string name="scheduled_timelaspe_title">Scheduled Timelaspe</string>
+    <string name="high_res_timelapse">High Res Timelapse</string>
 </resources>
